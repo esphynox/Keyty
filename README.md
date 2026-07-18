@@ -1,0 +1,59 @@
+<h1 align="center">
+  <a href="https://github.com/esphynox/Keyty">
+    <img src="Assets/Application/AppIcon/AppIcon.png" alt="Keyty app logo" width="128">
+    <br />
+    <strong>Keyty</strong>
+  </a>
+  <br>
+</h1>
+
+<div>
+   <img src="https://img.shields.io/github/v/release/esphynox/Keyty?style=flat-square" alt="Releases">
+   <img src="https://img.shields.io/github/downloads/esphynox/Keyty/total?style=flat-square" alt="Downloads">
+   <img src="https://img.shields.io/github/stars/esphynox/Keyty?style=flat-square" alt="Stars">
+   <img src="https://img.shields.io/github/license/esphynox/Keyty?style=flat-square" alt="License">
+   <img src="https://img.shields.io/badge/platform-macOS-lightgrey?style=flat-square" alt="Platform Support">
+</div>
+
+Keyty is a free, open-source app that visualizes your keyboard and mouse actions in real time,
+  making demos, presentations, tutorials, and livestreams easier to follow. It gives your audience a
+  clear view of every shortcut, click, and input so you can communicate more effectively on screen.
+
+## Features
+
+### Keyboard
+
+![Keyboard Demo](Docs/Resources/demo.gif)
+
+- Real-time display of keyboard shortcuts, special keys, and typed input
+- Customizable overlay styles, themes, size, layout, and fade timing
+- Filters for modified keystrokes, special keys, media keys, and mouse events
+
+### Mouse
+
+<p>
+  <img src="Docs/Resources/ring_demo.gif" alt="Pointer ring demo" width="49%">
+  <img src="Docs/Resources/pointer_icon_demo.gif" alt="Pointer icon demo" width="49%">
+</p>
+
+- Visualize mouse clicks and scroll actions alongside keyboard input
+- Pointer highlight ring with configurable shape, color, size, and thickness
+- Pointer icon overlay with adjustable position, size, background, and tint
+
+## Installation
+
+### Github
+
+Download the latest release from [GitHub](https://github.com/esphynox/Keyty/releases)
+
+### Build from Source
+
+To build Keyty locally from source, see [BUILD.md](Docs/BUILD.md).
+
+## Permissions
+
+Keyty requires your permission to receive events from macOS in order to display your keystrokes and mouse clicks. See [PERMISSIONS.md](Docs/PERMISSIONS.md) for setup and troubleshooting.
+
+## Privacy
+
+Input events are processed locally on your Mac. Keyty does not record, store, or upload your keystrokes, typed text, mouse clicks, or pointer activity. See [PRIVACY.md](Docs/PRIVACY.md) for details, including Sparkle update checks.

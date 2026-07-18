@@ -1,0 +1,47 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Tuist
+        run: brew install tuist
+
+      - name: Generate Project
+        working-directory: Apps/Keyty
+        run: tuist generate
+
+      - name: Build
+        working-directory: Apps/Keyty
+        run: |
+          xcodebuild build \
+            -project Keyty.xcodeproj \
+            -scheme Keyty \
+            -configuration Debug \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Test
+        working-directory: Apps/Keyty
+        run: |
+          xcodebuild test \
+            -project Keyty.xcodeproj \
+            -scheme Keyty \
+            -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO

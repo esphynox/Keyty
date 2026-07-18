@@ -1,0 +1,31 @@
+//
+//  KeycapRendererSupport.swift
+//  Keyty
+//
+//  SPDX-FileCopyrightText: 2026 Serhii Bykov
+//  SPDX-License-Identifier: BSD-3-Clause
+//
+
+import AppKit
+
+protocol KeycapRendering {
+    func size(for context: KeycapContext) -> CGSize
+    func draw(context: KeycapContext, in rect: NSRect)
+}
+
+func keycapWidth(for item: KeycapItem) -> CGFloat {
+    if let fixedWidth = item.fixedWidth {
+        return fixedWidth
+    }
+
+    if let fixedWidth = CommonKeycapMetrics.fixedIdentityWidths[item.identity] {
+        return fixedWidth
+    }
+
+    guard let label = item.label else {
+        return AppleKeycapMetrics.minWidth
+    }
+
+    let textWidth = label.size(withAttributes: [.font: CommonKeycapMetrics.labelFont]).width
+    return max(AppleKeycapMetrics.minWidth, textWidth + CommonKeycapMetrics.horizontalPadding * 2)
+}

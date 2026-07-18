@@ -1,0 +1,421 @@
+# Keyty release automation.
+#
+# Release lanes share the signed artifact pipeline: build -> Developer ID sign
+# -> notarize -> staple -> ZIP + DMG. The production lane then publishes a
+# GitHub release and Sparkle appcast; the beta lane stops after local artifacts.
+# It runs identically on your Mac and in CI; the ONLY difference is where the
+# secrets come from:
+#
+#   Locally  -> Developer ID cert + EdDSA key live in your login keychain;
+#               notarization uses the "Keyty-Notary" keychain profile.
+#   In CI    -> the same material is provided via env vars (see below), so no
+#               keychain profile is needed.
+#
+# CI env vars (all optional locally):
+#   NOTARY_KEY_PATH / NOTARY_KEY_ID / NOTARY_ISSUER  -> App Store Connect API key
+#   NOTARY_APPLE_ID / NOTARY_PASSWORD                -> Apple ID app-specific password
+#   SPARKLE_ED_KEY_FILE                              -> EdDSA private key file
+#   APPCAST_DOWNLOAD_PREFIX                          -> base URL for enclosures
+#   STAGING_APPCAST_URL                              -> feed URL compiled into staging builds
+#   STAGING_APPCAST_DOWNLOAD_PREFIX                  -> staging base URL for enclosures
+#   KEYTY_RELEASE_TEAM_ID                            -> Developer ID team
+#   KEYTY_RELEASE_CODE_SIGN_IDENTITY                 -> release signing identity
+#   KEYTY_NOTARY_PROFILE                             -> local notarytool keychain profile
+#   GH_TOKEN                                         -> used by `gh` (Actions sets this)
+
+require "shellwords"
+require "fileutils"
+require "json"
+require "net/http"
+require "open-uri"
+require "openssl"
+
+default_platform(:mac)
+
+REPO_ROOT  = File.expand_path("..", __dir__)
+PROJECT    = File.join(REPO_ROOT, "Apps", "Keyty", "Keyty.xcodeproj")
+BUILD_DIR  = File.join(REPO_ROOT, "build", "release")   # gitignored (build/)
+DIST_DIR   = File.join(REPO_ROOT, "dist")               # release artifacts + appcast.xml
+APPCAST_DIST_DIR = File.join(DIST_DIR, "appcast")       # production Sparkle feed inputs
+BETA_DIST_DIR = File.join(DIST_DIR, "beta")             # local test distribution artifacts
+STAGING_DIST_DIR = File.join(DIST_DIR, "staging")       # staging appcast + artifacts
+STAGING_APPCAST_DIST_DIR = File.join(STAGING_DIST_DIR, "appcast")
+APPCAST_FILENAME = "appcast.xml"
+DMG_SCRIPT = File.join(REPO_ROOT, "scripts", "build-dmg.sh")
+APP_ENTITLEMENTS = File.join(REPO_ROOT, "Apps", "Keyty", "Sources", "Keyty", "Resources", "Keyty.entitlements")
+SCHEME        = "Keyty"
+CONFIGURATION = "Release"
+TEAM_ID       = ENV["KEYTY_RELEASE_TEAM_ID"] || "NEVA4MAZBL"
+APP_NAME      = "Keyty"
+NOTARY_PROFILE = ENV["KEYTY_NOTARY_PROFILE"] || "Keyty-Notary"
+RELEASE_CODE_SIGN_IDENTITY = ENV["KEYTY_RELEASE_CODE_SIGN_IDENTITY"] || "Developer ID Application"
+# Where users download update archives from. By default this points to the
+# current GitHub release tag, so stable asset names such as Keyty.zip remain
+# unique per release.
+DOWNLOAD_PREFIX = ENV["APPCAST_DOWNLOAD_PREFIX"].to_s.strip
+PRODUCTION_APPCAST_URL = "https://keyty.app/appcast.xml"
+DEFAULT_STAGING_APPCAST_URL = "https://keyty.app/staging/appcast.xml"
+
+platform :mac do
+  desc "Full release: build, sign, notarize, staple, GitHub release, update appcast"
+  lane :release do |options|
+    generate_project
+
+    version = options[:version] || marketing_version
+    build   = build_number
+    tag     = "v#{version}"
+    app     = File.join(BUILD_DIR, "#{APP_NAME}.app")
+    zip     = File.join(APPCAST_DIST_DIR, "#{APP_NAME}.zip")
+    dmg     = File.join(DIST_DIR, "#{APP_NAME}.dmg")
+    download_prefix = appcast_download_prefix(tag: tag)
+    UI.header("Releasing #{APP_NAME} #{version} (#{build})")
+
+    build_distribution_artifacts(version: version, build: build, app: app, zip: zip, dmg: dmg, feed_url: PRODUCTION_APPCAST_URL)
+
+    seed_appcast_history(feed_url: PRODUCTION_APPCAST_URL, archive_dir: APPCAST_DIST_DIR)
+
+    # 5. GitHub release with both archives attached.
+    sh("gh release create #{tag.shellescape} #{zip.shellescape} " \
+       "#{dmg.shellescape} --title #{"#{APP_NAME} #{version}".shellescape} --generate-notes")
+
+    # 6. Update the Sparkle appcast (EdDSA-signs each entry, builds deltas).
+    generate_cumulative_appcast(
+      archive_dir: APPCAST_DIST_DIR,
+      output_path: File.join(DIST_DIR, APPCAST_FILENAME),
+      download_prefix: download_prefix
+    )
+
+    UI.success("Built + notarized + released #{tag}.")
+    if ENV["GITHUB_ACTIONS"]
+      UI.message("Next: GitHub Actions will publish #{DIST_DIR}/ to the Sparkle feed host.")
+    else
+      UI.message("Next: publish #{DIST_DIR}/appcast.xml to the Sparkle feed host.")
+    end
+  end
+
+  desc "Beta distribution: build, sign, notarize, staple, ZIP + DMG only"
+  lane :beta do |options|
+    generate_project
+
+    version = options[:version] || marketing_version
+    build   = (options[:build] || build_number).to_s
+    app     = File.join(BUILD_DIR, "#{APP_NAME}.app")
+    zip     = File.join(BETA_DIST_DIR, "#{APP_NAME}.zip")
+    dmg     = File.join(BETA_DIST_DIR, "#{APP_NAME}.dmg")
+    UI.header("Building beta #{APP_NAME} #{version} (#{build})")
+
+    build_distribution_artifacts(version: version, build: build, app: app, zip: zip, dmg: dmg, feed_url: PRODUCTION_APPCAST_URL)
+
+    UI.success("Built beta distribution artifacts.")
+    UI.message("DMG: #{dmg}")
+    UI.message("ZIP: #{zip}")
+    UI.message("Skipped GitHub release, Sparkle appcast generation, and feed publishing.")
+  end
+
+  desc "Staging appcast test: build, sign, notarize, prerelease, update staging appcast"
+  lane :appcast_staging do |options|
+    generate_project
+
+    version = options[:version] || marketing_version
+    build   = (options[:build] || build_number).to_s
+    tag     = (options[:tag] || "v#{version}-test").to_s
+    feed_url = staging_appcast_url(options)
+    app     = File.join(BUILD_DIR, "#{APP_NAME}.app")
+    zip     = File.join(STAGING_APPCAST_DIST_DIR, "#{APP_NAME}.zip")
+    dmg     = File.join(STAGING_DIST_DIR, "#{APP_NAME}.dmg")
+    download_prefix = staging_appcast_download_prefix(tag: tag)
+    UI.header("Building staging #{APP_NAME} #{version} (#{build}) for #{feed_url}")
+
+    build_distribution_artifacts(version: version, build: build, app: app, zip: zip, dmg: dmg, feed_url: feed_url)
+
+    seed_appcast_history(feed_url: feed_url, archive_dir: STAGING_APPCAST_DIST_DIR)
+
+    sh("gh release create #{tag.shellescape} #{zip.shellescape} " \
+       "#{dmg.shellescape} --title #{"#{APP_NAME} #{version} Staging".shellescape} " \
+       "--generate-notes --prerelease")
+
+    generate_cumulative_appcast(
+      archive_dir: STAGING_APPCAST_DIST_DIR,
+      output_path: File.join(STAGING_DIST_DIR, APPCAST_FILENAME),
+      download_prefix: download_prefix
+    )
+
+    UI.success("Built staging appcast test release #{tag}.")
+    UI.message("Next: publish #{STAGING_DIST_DIR}/appcast.xml to #{feed_url}.")
+  end
+end
+
+# --- helpers ---------------------------------------------------------------
+
+def generate_project
+  sh("cd #{File.join(REPO_ROOT, 'Apps/Keyty').shellescape} && tuist generate --no-open")
+end
+
+def appcast_download_prefix(tag:)
+  return trailing_slash(DOWNLOAD_PREFIX) unless DOWNLOAD_PREFIX.empty?
+
+  github_release_download_prefix(tag: tag)
+end
+
+def staging_appcast_url(options)
+  (options[:feed_url] || ENV["STAGING_APPCAST_URL"] || DEFAULT_STAGING_APPCAST_URL).to_s.strip
+end
+
+def staging_appcast_download_prefix(tag:)
+  prefix = ENV["STAGING_APPCAST_DOWNLOAD_PREFIX"].to_s.strip
+  return trailing_slash(prefix) unless prefix.empty?
+
+  github_release_download_prefix(tag: tag)
+end
+
+def github_release_download_prefix(tag:)
+  repository = github_repository
+  return "https://github.com/#{repository}/releases/download/#{tag}/" unless repository.empty?
+
+  UI.user_error!("Set an appcast download prefix or configure a GitHub origin remote")
+end
+
+def trailing_slash(value)
+  value.end_with?("/") ? value : "#{value}/"
+end
+
+def github_repository
+  repository = ENV["GITHUB_REPOSITORY"].to_s.strip
+  return repository unless repository.empty?
+
+  origin = `git -C #{REPO_ROOT.shellescape} config --get remote.origin.url`.strip
+  match = origin.match(%r{\Ahttps://github\.com/([^/]+/[^/.]+)(?:\.git)?\z}) ||
+          origin.match(%r{\Agit@github\.com:([^/]+/[^/.]+)(?:\.git)?\z})
+  match ? match[1] : ""
+end
+
+def marketing_version
+  out = sh("xcodebuild -project #{PROJECT.shellescape} -scheme #{SCHEME.shellescape} " \
+           "-configuration #{CONFIGURATION.shellescape} -showBuildSettings", log: false)
+  out[/MARKETING_VERSION = (.+)/, 1]&.strip or UI.user_error!("Could not read MARKETING_VERSION")
+end
+
+def build_number
+  return validated_build_number(ENV["GITHUB_RUN_NUMBER"], "GITHUB_RUN_NUMBER") if ENV["GITHUB_RUN_NUMBER"]
+
+  current_build_number.next.to_s
+end
+
+def current_build_number
+  out = sh("xcodebuild -project #{PROJECT.shellescape} -scheme #{SCHEME.shellescape} " \
+           "-configuration #{CONFIGURATION.shellescape} -showBuildSettings", log: false)
+  value = out[/CURRENT_PROJECT_VERSION = (.+)/, 1]&.strip
+  UI.user_error!("Could not read CURRENT_PROJECT_VERSION") unless value
+
+  validated_build_number(value, "CURRENT_PROJECT_VERSION").to_i
+end
+
+def validated_build_number(value, name)
+  UI.user_error!("#{name} must be an integer") unless value.match?(/\A\d+\z/)
+
+  value
+end
+
+def seed_appcast_history(feed_url:, archive_dir:)
+  FileUtils.mkdir_p(archive_dir)
+  appcast = File.join(archive_dir, APPCAST_FILENAME)
+  FileUtils.rm_f(appcast)
+
+  UI.message("Fetching existing appcast history from #{feed_url}")
+  URI.open(
+    feed_url,
+    "User-Agent" => "Keyty release appcast fetch",
+    open_timeout: 15,
+    read_timeout: 20
+  ) do |remote|
+    body = remote.read
+    if body.strip.empty?
+      UI.important("Existing appcast at #{feed_url} is empty; starting a new appcast.")
+      return
+    end
+
+    File.binwrite(appcast, body)
+  end
+  UI.message("Seeded appcast history from #{feed_url}")
+rescue OpenURI::HTTPError => e
+  status = e.io.status.first.to_i
+  if status == 404
+    UI.message("No existing appcast found at #{feed_url}; starting a new appcast.")
+  else
+    UI.user_error!("Could not fetch existing appcast from #{feed_url} (HTTP #{status}): #{e.message}")
+  end
+rescue Errno::ECONNREFUSED, Errno::ETIMEDOUT, Net::OpenTimeout, Net::ReadTimeout,
+       OpenSSL::SSL::SSLError, SocketError, URI::InvalidURIError => e
+  UI.user_error!("Could not fetch existing appcast from #{feed_url}: #{e.class}: #{e.message}")
+end
+
+def generate_cumulative_appcast(archive_dir:, output_path:, download_prefix:)
+  appcast = File.join(archive_dir, APPCAST_FILENAME)
+  sh("#{generate_appcast.shellescape} #{sparkle_key_args} " \
+     "--maximum-versions 0 " \
+     "-o #{appcast.shellescape} " \
+     "--download-url-prefix #{download_prefix.shellescape} #{archive_dir.shellescape}")
+
+  return if File.expand_path(appcast) == File.expand_path(output_path)
+
+  FileUtils.mkdir_p(File.dirname(output_path))
+  FileUtils.cp(appcast, output_path)
+end
+
+def build_distribution_artifacts(version:, build:, app:, zip:, dmg:, feed_url:)
+  archive = File.join(BUILD_DIR, "#{APP_NAME}.xcarchive")
+  validate_notary_credentials!
+
+  # Archive directly instead of using gym's macOS export path. The archive step
+  # produces a Developer ID signed .app; the remaining lane handles notarization
+  # and packaging from that app bundle.
+  FileUtils.mkdir_p(BUILD_DIR)
+  FileUtils.rm_rf(archive)
+  FileUtils.rm_rf(app)
+  sh("xcodebuild -project #{PROJECT.shellescape} -scheme #{SCHEME.shellescape} " \
+     "-configuration #{CONFIGURATION.shellescape} " \
+     "-destination #{"generic/platform=macOS".shellescape} " \
+     "-archivePath #{archive.shellescape} " \
+     "#{release_xcargs(version: version, build: build, feed_url: feed_url)} clean archive")
+
+  copy_app(archived_app_path(archive), app)
+  prepare_distribution_app(app)
+  UI.user_error!("Expected #{DMG_SCRIPT} to exist") unless File.exist?(DMG_SCRIPT)
+
+  # Notarize the ZIP and DMG containers. Keep the app bundle itself unchanged
+  # after signing; stapling a .app adds Contents/CodeResources, which can trip
+  # strict signature validation after the app is copied into a disk image.
+  FileUtils.mkdir_p(File.dirname(zip))
+  ditto(app, zip)
+  notarize(zip)
+  sh("spctl --assess --type execute --verbose #{app.shellescape}") # Gatekeeper sanity check
+
+  # Build the drag-to-Applications DMG from the signed app, then notarize it.
+  FileUtils.mkdir_p(File.dirname(dmg))
+  FileUtils.rm_f(dmg)
+  sh("#{DMG_SCRIPT.shellescape} --app #{app.shellescape} --output #{dmg.shellescape}")
+  notarize(dmg)
+  sh("xcrun stapler staple #{dmg.shellescape}")
+end
+
+def ditto(app, zip)
+  sh("ditto -c -k --keepParent #{app.shellescape} #{zip.shellescape}")
+end
+
+def archived_app_path(archive)
+  app = Dir.glob(File.join(archive, "Products", "**", "#{APP_NAME}.app")).first
+  app or UI.user_error!("Expected #{APP_NAME}.app inside #{archive}")
+end
+
+def copy_app(source, destination)
+  FileUtils.mkdir_p(File.dirname(destination))
+  FileUtils.rm_rf(destination)
+  sh("ditto #{source.shellescape} #{destination.shellescape}")
+  UI.user_error!("Expected #{destination} after archive copy") unless File.directory?(destination)
+end
+
+def prepare_distribution_app(app)
+  resign_embedded_sparkle(app)
+  sh("codesign --force --sign #{RELEASE_CODE_SIGN_IDENTITY.shellescape} " \
+     "--options runtime --timestamp --entitlements #{APP_ENTITLEMENTS.shellescape} " \
+     "#{app.shellescape}")
+  sh("codesign --verify --deep --strict --verbose=2 #{app.shellescape}")
+end
+
+def resign_embedded_sparkle(app)
+  sparkle = File.join(app, "Contents", "Frameworks", "Sparkle.framework")
+  return unless File.directory?(sparkle)
+
+  version = File.join(sparkle, "Versions", "B")
+  [
+    File.join(version, "Autoupdate"),
+    File.join(version, "Updater.app"),
+    File.join(version, "XPCServices", "Downloader.xpc"),
+    File.join(version, "XPCServices", "Installer.xpc"),
+    sparkle
+  ].each do |path|
+    UI.user_error!("Expected Sparkle code item at #{path}") unless File.exist?(path)
+
+    sh("codesign --force --sign #{RELEASE_CODE_SIGN_IDENTITY.shellescape} " \
+       "--options runtime --timestamp #{path.shellescape}")
+  end
+end
+
+def release_xcargs(version:, build:, feed_url:)
+  [
+    "MARKETING_VERSION=#{version.shellescape}",
+    "CURRENT_PROJECT_VERSION=#{build.shellescape}",
+    "SPARKLE_FEED_URL=#{feed_url.shellescape}",
+    "DEVELOPMENT_TEAM=#{TEAM_ID.shellescape}"
+  ].join(" ")
+end
+
+def notarize(path)
+  output = sh("xcrun notarytool submit #{notary_credentials.shelljoin} " \
+              "--wait --output-format json #{path.shellescape}", log: false)
+  result = JSON.parse(output)
+  status = result["status"]
+  return if status == "Accepted"
+
+  log = notary_log(result["id"])
+  UI.user_error!("Notarization failed for #{path} with status #{status}:\n#{log}")
+rescue JSON::ParserError
+  UI.user_error!("Could not parse notarytool output for #{path}:\n#{output}")
+end
+
+def notary_log(submission_id)
+  return "notarytool did not return a submission id" if submission_id.to_s.empty?
+
+  sh("xcrun notarytool log #{submission_id.shellescape} #{notary_credentials.shelljoin}", log: false)
+end
+
+# Notarization creds: API key from env in CI, keychain profile locally.
+def notary_credentials
+  if ENV["NOTARY_KEY_PATH"]
+    ["--key", ENV["NOTARY_KEY_PATH"], "--key-id", ENV["NOTARY_KEY_ID"], "--issuer", ENV["NOTARY_ISSUER"]]
+  elsif ENV["NOTARY_APPLE_ID"] || ENV["NOTARY_PASSWORD"]
+    UI.user_error!("NOTARY_APPLE_ID and NOTARY_PASSWORD must both be set") unless ENV["NOTARY_APPLE_ID"] && ENV["NOTARY_PASSWORD"]
+
+    ["--apple-id", ENV["NOTARY_APPLE_ID"], "--password", ENV["NOTARY_PASSWORD"], "--team-id", TEAM_ID]
+  else
+    ["--keychain-profile", NOTARY_PROFILE]
+  end
+end
+
+def validate_notary_credentials!
+  if ENV["NOTARY_KEY_PATH"]
+    missing = ["NOTARY_KEY_ID", "NOTARY_ISSUER"].select { |key| ENV[key].to_s.empty? }
+    UI.user_error!("Missing notarization env vars: #{missing.join(', ')}") unless missing.empty?
+    UI.user_error!("NOTARY_KEY_PATH does not exist: #{ENV['NOTARY_KEY_PATH']}") unless File.exist?(ENV["NOTARY_KEY_PATH"])
+    return
+  end
+
+  return if ENV["NOTARY_APPLE_ID"] || ENV["NOTARY_PASSWORD"]
+
+  command = [
+    "xcrun", "notarytool", "history",
+    "--keychain-profile", NOTARY_PROFILE,
+    "--output-format", "json",
+    "--no-progress"
+  ]
+  return if system(*command, out: File::NULL, err: File::NULL)
+
+  UI.user_error!(
+    "No valid notarytool profile named #{NOTARY_PROFILE.inspect}. Create it with:\n" \
+    "  xcrun notarytool store-credentials #{NOTARY_PROFILE.shellescape} --apple-id <apple-id> --team-id #{TEAM_ID.shellescape} --password <app-specific-password>\n" \
+    "Or set NOTARY_KEY_PATH, NOTARY_KEY_ID, and NOTARY_ISSUER for API-key notarization."
+  )
+end
+
+# EdDSA key: file from env in CI, keychain (no args) locally.
+def sparkle_key_args
+  ENV["SPARKLE_ED_KEY_FILE"] ? "--ed-key-file #{ENV['SPARKLE_ED_KEY_FILE'].shellescape}" : ""
+end
+
+# Locate Sparkle's generate_appcast from the SwiftPM binary artifact.
+def generate_appcast
+  return "#{ENV['SPARKLE_BIN']}/generate_appcast" if ENV["SPARKLE_BIN"]
+  hit = Dir.glob(File.expand_path("~/Library/Developer/Xcode/DerivedData/**/artifacts/sparkle/Sparkle/bin/generate_appcast")).first ||
+        Dir.glob(File.join(REPO_ROOT, ".deriveddata/**/artifacts/sparkle/Sparkle/bin/generate_appcast")).first
+  hit or UI.user_error!("generate_appcast not found; build once or set SPARKLE_BIN")
+end

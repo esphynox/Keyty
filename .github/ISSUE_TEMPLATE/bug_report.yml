@@ -1,0 +1,90 @@
+name: Bug report
+description: Report a reproducible problem with Keyty.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please include enough macOS, permission, and reproduction context for someone else to verify it.
+
+  - type: input
+    id: keyty-version
+    attributes:
+      label: Keyty version
+      description: Include the version and build if available.
+      placeholder: "0.8.0 (1)"
+    validations:
+      required: true
+
+  - type: input
+    id: macos-version
+    attributes:
+      label: macOS version
+      placeholder: "macOS 15.5"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Install method
+      options:
+        - GitHub release
+        - Homebrew
+        - Built from source
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest set of steps that triggers the issue.
+      placeholder: |
+        1. Open Keyty
+        2. Enable ...
+        3. Press/click ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshots or screen recording
+      description: Drag images/videos here if they help show the issue. Avoid sharing sensitive input.
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or crash report
+      description: Paste relevant logs or crash output if available.
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Include keyboard layout, external displays, input devices, or permission troubleshooting already tried.
+    validations:
+      required: false

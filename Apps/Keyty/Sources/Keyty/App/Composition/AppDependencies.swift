@@ -1,0 +1,51 @@
+//
+//  AppDependencies.swift
+//  Keyty
+//
+//  SPDX-FileCopyrightText: 2026 Serhii Bykov
+//  SPDX-License-Identifier: BSD-3-Clause
+//
+
+import AppKit
+import Sparkle
+
+@MainActor
+final class AppDependencies {
+    let settings: AppSettingsContainer
+    let services: AppServiceContainer
+    let ui: AppUIContainer
+
+    var captureController: CaptureController { self.services.captureController }
+    var appSettings: any AppSettingsProtocol { self.settings.appSettings }
+    var permissionsService: any PermissionsService { self.services.permissionsService }
+    var permissionsOnboardingWindowController: PermissionsOnboardingWindowController { self.ui.permissionsOnboardingWindowController }
+    var pointerVisualizersManager: PointerVisualizersManager { self.services.pointerVisualizersManager }
+    var pointerRingSettings: any PointerRingSettingsProtocol { self.settings.pointerRingSettings }
+    var pointerIconSettings: any PointerIconSettingsProtocol { self.settings.pointerIconSettings }
+    var aboutWindowController: AboutWindowController { self.ui.aboutWindowController }
+    var settingsWindowController: SettingsWindowController { self.ui.settingsWindowController }
+    var presenceManager: PresenceManager { self.services.presenceManager }
+    var shortcutManager: ShortcutManager { self.services.shortcutManager }
+
+    init(
+        dockItemController: DockItemController,
+        statusShortcutItem: NSMenuItem,
+        updater: SPUUpdater,
+        keyValueStore: KeyValueStore = UserDefaultsStore()
+    ) {
+        self.settings = AppSettingsContainer(store: keyValueStore)
+        self.services = AppServiceContainer(
+            settings: self.settings,
+            dockItemController: dockItemController
+        )
+        self.ui = AppUIContainer(
+            settings: self.settings,
+            services: self.services,
+            updater: updater
+        )
+
+        self.services.shortcutManager.statusShortcutItem = statusShortcutItem
+        self.services.shortcutManager.dockShortcutItem = dockItemController.shortcutItem
+        self.services.shortcutManager.refreshMenuItems()
+    }
+}

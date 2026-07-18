@@ -1,0 +1,2 @@
+app_identifier("io.github.keyty")
+team_id(ENV["KEYTY_RELEASE_TEAM_ID"] || "NEVA4MAZBL")

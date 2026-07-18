@@ -1,0 +1,236 @@
+/* Main menu */
+"main_menu.about" = "About %@";
+"main_menu.check_for_updates" = "Check For Updates";
+"main_menu.settings" = "Settings…";
+"main_menu.services" = "Services";
+"main_menu.hide" = "Hide %@";
+"main_menu.hide_others" = "Hide Others";
+"main_menu.show_all" = "Show All";
+"main_menu.quit" = "Quit %@";
+"main_menu.file" = "File";
+"main_menu.close" = "Close";
+"main_menu.help" = "Help";
+"main_menu.send_feedback" = "Send Feedback…";
+"main_menu.github" = "GitHub…";
+"main_menu.website" = "Website…";
+
+/* About window */
+"about.version" = "Version %@ (%@)";
+"about.tab.license" = "License";
+"about.tab.contributors" = "Contributors";
+"about.tab.credits" = "Credits";
+"about.license.keyty_title" = "Keyty";
+"about.license.keyty_subtitle" = "BSD 3-Clause License";
+"about.contributors.title" = "Contributors";
+"about.contributors.subtitle" = "People who helped make Keyty better.";
+"about.contributors.serhii_bykov" = "Serhii Bykov";
+"about.contributors.yullia_babichuk" = "Yullia Babichuk";
+"about.contributors.oleksii_petruk" = "Oleksii Petruk";
+"about.contributors.serhii_butenko" = "Serhii Butenko";
+"about.credits.sparkle_subtitle" = "MIT License";
+"about.credits.app_mover_subtitle" = "MIT License";
+"about.credits.shortcut_recorder_subtitle" = "Creative Commons Attribution 4.0 International";
+"about.credits.license_missing" = "License text could not be loaded.";
+
+/* Settings pane tab labels */
+"settings.sidebar_subtitle" = "Settings";
+"settings.sidebar_version" = "version %@ (%@)";
+"settings.pane.general" = "General";
+"settings.pane.keyboard" = "Keyboard";
+"settings.pane.mouse" = "Mouse";
+"settings.pane.displays" = "Displays";
+"settings.pane.permissions" = "Permissions";
+"settings.pane.update" = "Update";
+
+/* Anchor labels */
+"anchor.left" = "Left";
+"anchor.center" = "Center";
+"anchor.right" = "Right";
+"anchor.top" = "Top";
+"anchor.vertical_center" = "Center";
+"anchor.bottom" = "Bottom";
+
+/* Displays settings pane */
+"displays.display_label" = "Display";
+"displays.display_subtitle" = "Display to host the keyboard overlay";
+"displays.anchor_label" = "Anchor";
+"displays.anchor_subtitle" = "Keyboard overlay anchor position";
+"displays.margin_label" = "Screen Inset";
+"displays.margin_subtitle" = "Distance between the overlay and the selected screen edge.";
+
+/* General settings pane */
+"general.appearance_section_title" = "App";
+"general.shortcut_section_title" = "Shortcut";
+"general.display_icon_label" = "Display %@ icon";
+"general.display_icon_subtitle" = "Choose where the app icon is visible";
+"general.display_icon.menu_bar" = "Menu Bar";
+"general.display_icon.dock" = "Dock";
+"general.display_icon.menu_bar_and_dock" = "Menu Bar and Dock";
+"general.toggle_capturing_label" = "Toggle capturing";
+"general.toggle_capturing_subtitle" = "Global shortcut used to start or stop capturing from anywhere.";
+"general.start_capturing" = "Enable";
+"general.stop_capturing" = "Disable";
+"general.show_settings_at_launch" = "Show settings at launch";
+"general.show_settings_at_launch_subtitle" = "Reopen the settings window automatically when Keyty starts.";
+
+/* Keyboard visualizer settings pane */
+"keyboard_visualizer.live_overlay_section_title" = "Live Overlay";
+"keyboard_visualizer.live_overlay_section_subtitle" = "This is a real renderer-backed sample using the current keyboard visualizer settings.";
+"keyboard_visualizer.style_section_title" = "Style";
+"keyboard_visualizer.style_section_subtitle" = "Choose the overall keycap construction and finish.";
+"keyboard_visualizer.theme_section_title" = "Theme";
+"keyboard_visualizer.theme_section_subtitle" = "Give each key type its own color palette.";
+"keyboard_visualizer.layout_section_title" = "Layout";
+"keyboard_visualizer.layout_section_subtitle" = "Control stack direction, screen anchor, and how much space the overlay occupies.";
+"keyboard_visualizer.timing_section_title" = "Timing";
+"keyboard_visualizer.timing_section_subtitle" = "Balance readability and responsiveness by controlling how long keys remain visible and how quickly they fade.";
+"keyboard_visualizer.filter_section_title" = "Filter";
+"keyboard_visualizer.filter_section_subtitle" = "Choose which keyboard events appear in the overlay.";
+"keyboard_visualizer.axis_label" = "Axis";
+"keyboard_visualizer.axis_subtitle" = "Direction used to stack consecutive key groups.";
+"keyboard_visualizer.anchor_label" = "Position";
+"keyboard_visualizer.anchor_subtitle" = "Screen edge where the overlay is pinned.";
+"keyboard_visualizer.axis.vertical" = "Vertical";
+"keyboard_visualizer.axis.horizontal" = "Horizontal";
+"keyboard_visualizer.max_count_label" = "Max Count";
+"keyboard_visualizer.max_count_subtitle" = "Maximum number of visible keycaps in the stack.";
+"keyboard_visualizer.size_label" = "Size";
+"keyboard_visualizer.size_subtitle" = "Overall scale of the rendered keycaps.";
+"keyboard_visualizer.style_label" = "Style";
+"keyboard_visualizer.style_subtitle" = "Overall keycap construction and surface treatment.";
+"keyboard_visualizer.style.apple" = "Apple";
+"keyboard_visualizer.style.pbt" = "PBT";
+"keyboard_visualizer.style.minimal" = "Minimal";
+"keyboard_visualizer.style.retro" = "Retro";
+"keyboard_visualizer.linger_time_label" = "Linger Time";
+"keyboard_visualizer.linger_time_subtitle" = "How long keycaps remain fully visible before fading.";
+"keyboard_visualizer.linger_time.short" = "Short";
+"keyboard_visualizer.linger_time.long" = "Long";
+"keyboard_visualizer.fade_duration_label" = "Fade Duration";
+"keyboard_visualizer.fade_duration_subtitle" = "How quickly keycaps fade out once fading begins.";
+"keyboard_visualizer.fade_duration.fast" = "Fast";
+"keyboard_visualizer.fade_duration.slow" = "Slow";
+"keyboard_visualizer.only_show_modified_keystrokes_label" = "Show key combinations only";
+"keyboard_visualizer.only_show_modified_keystrokes_subtitle" = "Only show keys pressed with Command, Control, Option, or Shift.";
+"keyboard_visualizer.show_special_keys_label" = "Special keys";
+"keyboard_visualizer.show_special_keys_subtitle" = "Tab, return, arrows, fn, function keys, and similar keys.";
+"keyboard_visualizer.show_media_key_buttons_label" = "Media key buttons";
+"keyboard_visualizer.show_media_key_buttons_subtitle" = "Playback, volume, brightness, and similar media-key buttons.";
+"keyboard_visualizer.show_mouse_events_label" = "Mouse events";
+"keyboard_visualizer.show_mouse_events_subtitle" = "Mouse clicks and wheel events.";
+
+/* Keyboard visualizer theme settings */
+"keyboard_visualizer.theme_label" = "Theme";
+"keyboard_visualizer.theme_subtitle" = "Color palette applied to the selected keycap style.";
+"keyboard_visualizer.legend_color_label" = "Legend Color";
+"keyboard_visualizer.legend_color_subtitle" = "Color used for text, symbols, and mouse icons drawn on keycaps.";
+"keyboard_visualizer.choose_color" = "Choose Color…";
+"keyboard_visualizer.theme_custom" = "Custom…";
+"keyboard_visualizer.regular_theme_label" = "Regular keys";
+"keyboard_visualizer.regular_theme_subtitle" = "Theme for letters, numbers, and other text keys.";
+"keyboard_visualizer.modifier_theme_label" = "Modifiers";
+"keyboard_visualizer.modifier_theme_subtitle" = "Theme for command, shift, option, control, and fn.";
+"keyboard_visualizer.special_theme_label" = "Special keys";
+"keyboard_visualizer.special_theme_subtitle" = "Theme for tab, return, arrows, function keys, and other non-text keys.";
+"keyboard_visualizer.media_theme_label" = "Media keys";
+"keyboard_visualizer.media_theme_subtitle" = "Theme for playback and brightness controls.";
+"keyboard_visualizer.mouse_theme_label" = "Mouse events";
+"keyboard_visualizer.mouse_theme_subtitle" = "Theme for mouse clicks and wheel events.";
+"keyboard_visualizer.group_background_theme_label" = "Group background";
+"keyboard_visualizer.group_background_theme_subtitle" = "Theme for the panel drawn behind each group of keys.";
+"keyboard_visualizer.theme.citrus" = "Citrus";
+"keyboard_visualizer.theme.blue" = "Blue";
+"keyboard_visualizer.theme.green" = "Green";
+"keyboard_visualizer.theme.white" = "White";
+"keyboard_visualizer.theme.dark" = "Dark";
+"keyboard_visualizer.theme.red" = "Red";
+"keyboard_visualizer.theme.indigo" = "Indigo";
+"keyboard_visualizer.theme.rose" = "Rose";
+"keyboard_visualizer.theme.purple" = "Purple";
+"keyboard_visualizer.theme.yellow" = "Yellow";
+"keyboard_visualizer.theme.orange" = "Orange";
+"keyboard_visualizer.theme.pink" = "Pink";
+"keyboard_visualizer.color.automatic" = "Automatic";
+"keyboard_visualizer.color.red" = "Red";
+"keyboard_visualizer.color.orange" = "Orange";
+"keyboard_visualizer.color.yellow" = "Yellow";
+"keyboard_visualizer.color.green" = "Green";
+"keyboard_visualizer.color.blue" = "Blue";
+"keyboard_visualizer.color.purple" = "Purple";
+"keyboard_visualizer.color.pink" = "Pink";
+"keyboard_visualizer.color.white" = "White";
+"keyboard_visualizer.color.black" = "Black";
+
+/* Mouse settings pane */
+"mouse.tab_ring" = "Ring";
+"mouse.tab_icon" = "Icon";
+"mouse.pointer_ring_label" = "Pointer Ring";
+"mouse.enabled" = "Enabled";
+"mouse.enabled_subtitle" = "Pointer ring visibility.";
+"mouse.always_visible_label" = "Always Visible";
+"mouse.always_visible_subtitle" = "Ring remains visible while the pointer is idle.";
+"mouse.ring_color_label" = "Color";
+"mouse.ring_color_subtitle" = "Preset or custom color of the pointer ring.";
+"mouse.ring_size_label" = "Size";
+"mouse.ring_size_subtitle" = "Diameter of the pointer ring.";
+"mouse.ring_thickness_label" = "Thickness";
+"mouse.ring_thickness_subtitle" = "Stroke width of the pointer ring.";
+"mouse.ring_shape_label" = "Shape";
+"mouse.ring_shape_subtitle" = "Outline geometry of the pointer ring.";
+"mouse.pointer_icon_label" = "Pointer Icon";
+"mouse.pointer_icon_enabled" = "Enabled";
+"mouse.pointer_icon_enabled_subtitle" = "Pointer icon overlay visibility.";
+"mouse.pointer_icon_always_visible_label" = "Always Visible";
+"mouse.pointer_icon_always_visible_subtitle" = "Icon remains visible when no mouse buttons are active.";
+"mouse.pointer_icon_anchor_label" = "Anchor";
+"mouse.pointer_icon_anchor_subtitle" = "Pointer edge used as the icon anchor.";
+"mouse.pointer_icon_offset_label" = "Offset";
+"mouse.pointer_icon_offset_subtitle" = "Distance between the pointer and its icon overlay.";
+"mouse.icon_size_label" = "Icon Size";
+"mouse.icon_size_subtitle" = "Scale of the pointer icon overlay.";
+"mouse.icon_background_label" = "Background Color";
+"mouse.icon_background_subtitle" = "Fill color behind the pointer icon.";
+"mouse.icon_tint_label" = "Icon Color";
+"mouse.icon_tint_subtitle" = "Foreground tint of the pointer icon.";
+"mouse.choose_color" = "Choose Color…";
+"mouse.color.automatic" = "Automatic";
+"mouse.color.red" = "Red";
+"mouse.color.orange" = "Orange";
+"mouse.color.yellow" = "Yellow";
+"mouse.color.green" = "Green";
+"mouse.color.blue" = "Blue";
+"mouse.color.purple" = "Purple";
+"mouse.color.pink" = "Pink";
+"mouse.color.graphite" = "Graphite";
+"mouse.color.white" = "White";
+"mouse.color.black" = "Black";
+"mouse.shape.circle" = "Circle";
+"mouse.shape.rhomb" = "Rhomb";
+"mouse.shape.squircle" = "Squircle";
+
+/* Permissions settings pane */
+"permissions.accessibility_label" = "Accessibility";
+"permissions.section_subtitle" = "Keyty needs Accessibility permission to observe and display your input events.";
+"permissions.status.granted" = "Granted";
+"permissions.status.not_granted" = "Not Granted";
+"permissions.grant_access_button" = "Grant…";
+
+/* Permissions onboarding */
+"permissions_onboarding.title" = "Set Up Keyty";
+"permissions_onboarding.subtitle" = "To enable keyboard and mouse visualization,\ngrant macOS Accessibility permission.";
+"permissions_onboarding.accessibility.title" = "Accessibility";
+"permissions_onboarding.accessibility.detail" = "Required to display keyboard and mouse input.";
+"permissions_onboarding.accessibility.grant_button" = "Grant…";
+"permissions_onboarding.privacy" = "All input is processed locally on your Mac. Nothing is uploaded or stored.";
+"permissions_onboarding.learn_more" = "Learn more";
+"permissions_onboarding.continue" = "Continue";
+"permissions_onboarding.continue_hint" = "Continue once Accessibility is granted.";
+
+/* Update settings pane */
+"update.check_at_startup" = "Check for updates at startup";
+"update.check_at_startup_subtitle" = "Sparkle will periodically check for new versions.";
+"update.include_system_profile" = "Include anonymous system profile";
+"update.include_system_profile_subtitle" = "Send a basic hardware profile when checking for updates.";
+"update.last_checked_label" = "Last checked";
+"update.never" = "Never";
+"update.check_now_button" = "Check for Updates";

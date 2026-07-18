@@ -1,0 +1,50 @@
+name: Feature request
+description: Suggest an improvement or new capability for Keyty.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for feature requests and product improvements. For implementation-ready changes, a pull request is also welcome.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What are you trying to do, and what is currently difficult or missing?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the behavior, setting, or UI you would like to see.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe any workaround or alternate design you considered.
+    validations:
+      required: false
+
+  - type: textarea
+    id: ui-impact
+    attributes:
+      label: UI or settings impact
+      description: Note whether this needs new settings, menu items, onboarding, visual styles, or documentation.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add mockups, screenshots, examples from other apps, or related issues.
+    validations:
+      required: false

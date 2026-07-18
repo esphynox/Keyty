@@ -1,0 +1,78 @@
+# Xcode
+#
+# gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
+/Apps/Keyty/Keyty.xcodeproj
+/Apps/Keyty/Keyty.xcworkspace
+/Apps/Keyty/.package.resolved
+/Apps/Keyty/Derived/
+/Derived/
+
+## User settings
+xcuserdata/
+
+## compatibility with Xcode 8 and earlier (ignoring not required starting Xcode 9)
+*.xcscmblueprint
+*.xccheckout
+
+## compatibility with Xcode 3 and earlier (ignoring not required starting Xcode 4)
+build/
+DerivedData/
+.deriveddata/
+.venv-release/
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+## Gcc Patch
+/*.gcno
+
+## Configuration
+/Signing.xcconfig
+/Version.xcconfig
+/Release.xcconfig
+
+# Fastlane
+fastlane/README.md
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/test_output
+vendor/bundle
+.bundle
+
+# Release output
+/dist/
+
+# Secrets — never commit signing material
+*.p8
+*.p12
+*_private_key*
+
+# macOS
+.DS_Store
+
+# Node.js
+node_modules
+
+# Ruby / Bundler / Fastlane
+/.bundle/
+/vendor/bundle/
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/test_output
+
+# Release output
+/dist/
+
+# Secrets — never commit signing material
+*.p8
+*.p12
+*_private_key*
+
+# Claude
+.claude/

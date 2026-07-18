@@ -1,0 +1,134 @@
+//
+//  MouseSettingsPane+PointerRingSettings.swift
+//  Keyty
+//
+//  SPDX-FileCopyrightText: 2026 Serhii Bykov
+//  SPDX-License-Identifier: BSD-3-Clause
+//
+
+import SwiftUI
+
+extension MouseSettingsPane {
+    var pointerRingSettingsSection: some View {
+        SettingsSectionView {
+            SettingsControlRow(title: L10n.Mouse.enabled, subtitle: L10n.Mouse.enabledSubtitle) {
+                Toggle("", isOn: self.$model.ringEnabled)
+                    .labelsHidden()
+                    .toggleStyle(.switch)
+                    .controlSize(.small)
+            }
+
+            Divider()
+
+            SettingsControlRow(title: L10n.Mouse.alwaysVisibleLabel, subtitle: L10n.Mouse.alwaysVisibleSubtitle) {
+                Toggle("", isOn: self.$model.ringAlwaysVisible)
+                    .labelsHidden()
+                    .toggleStyle(.switch)
+                    .controlSize(.small)
+                    .disabled(!self.model.ringEnabled)
+            }
+
+            Divider()
+
+            SettingsControlRow(title: L10n.Mouse.ringShapeLabel, subtitle: L10n.Mouse.ringShapeSubtitle) {
+                Picker("", selection: self.$model.ringShape) {
+                    ForEach(PointerRingShape.allCases) { shape in
+                        Text(shape.label).tag(shape)
+                    }
+                }
+                .labelsHidden()
+                .frame(width: Size.Control.settingsPickerWidth, alignment: .trailing)
+                .disabled(!self.model.ringEnabled)
+            }
+
+            Divider()
+
+            SettingsControlRow(title: L10n.Mouse.ringColorLabel, subtitle: L10n.Mouse.ringColorSubtitle) {
+                self.ringColorControls
+                    .disabled(!self.model.ringEnabled)
+            }
+
+            Divider()
+
+            SettingsControlRow(title: L10n.Mouse.ringSizeLabel, subtitle: L10n.Mouse.ringSizeSubtitle) {
+                Slider(
+                    value: self.$model.ringSize,
+                    in: MouseSettingsPaneViewModel.ringSizeRange,
+                    step: MouseSettingsPaneViewModel.ringSizeStep
+                )
+                    .frame(width: Spacing.grid(42))
+                    .disabled(!self.model.ringEnabled)
+            }
+
+            Divider()
+
+            SettingsControlRow(title: L10n.Mouse.ringThicknessLabel, subtitle: L10n.Mouse.ringThicknessSubtitle) {
+                Slider(
+                    value: self.$model.ringThickness,
+                    in: MouseSettingsPaneViewModel.ringThicknessRange,
+                    step: MouseSettingsPaneViewModel.ringThicknessStep
+                )
+                    .frame(width: Spacing.grid(42))
+                    .disabled(!self.model.ringEnabled)
+            }
+        }
+    }
+
+    private var ringColorControls: some View {
+        Picker(
+            "",
+            selection: Binding(
+                get: { self.model.ringColorSelectionID },
+                set: { selectionID in
+                    if selectionID == MouseSettingsPaneViewModel.customRingColorSelectionID {
+                        self.model.beginChoosingCustomRingColor()
+                        self.ringColorPanel.present(initialColor: self.model.ringColor)
+                        return
+                    }
+
+                    self.model.selectRingColor(with: selectionID)
+                }
+            )
+        ) {
+            if let automaticPreset = MouseSettingsPaneViewModel.ColorPreset.ringColorPresets.first {
+                self.colorMenuItem(
+                    title: automaticPreset.title,
+                    swatchColor: automaticPreset.color,
+                    tag: automaticPreset.color.hexString
+                )
+            }
+
+            Section {
+                ForEach(Array(MouseSettingsPaneViewModel.ColorPreset.ringColorPresets.dropFirst())) { preset in
+                    self.colorMenuItem(
+                        title: preset.title,
+                        swatchColor: preset.color,
+                        tag: preset.color.hexString
+                    )
+                }
+            }
+
+            Section {
+                self.colorMenuItem(
+                    title: L10n.Mouse.chooseColor,
+                    swatchColor: self.model.ringColor,
+                    tag: MouseSettingsPaneViewModel.customRingColorSelectionID
+                )
+            }
+        }
+        .labelsHidden()
+        .pickerStyle(.menu)
+        .frame(width: Size.Control.settingsPickerWidth, alignment: .trailing)
+        .onAppear {
+            self.ringColorPanel.onColorChange = { color in
+                self.model.applyCustomRingColor(color)
+            }
+            self.iconBackgroundColorPanel.onColorChange = { color in
+                self.model.applyCustomIconBackgroundColor(color)
+            }
+            self.iconTintColorPanel.onColorChange = { color in
+                self.model.applyCustomIconTintColor(color)
+            }
+        }
+    }
+}

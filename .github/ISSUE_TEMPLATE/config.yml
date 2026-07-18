@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Build and development help
+    url: https://github.com/esphynox/Keyty/blob/main/Docs/DEVELOPING.md
+    about: Read the local development workflow before filing build setup issues.
+  - name: Permissions troubleshooting
+    url: https://github.com/esphynox/Keyty/blob/main/Docs/PERMISSIONS.md
+    about: Check macOS Accessibility permission setup and troubleshooting steps.
+  - name: Privacy details
+    url: https://github.com/esphynox/Keyty/blob/main/Docs/PRIVACY.md
+    about: Learn how Keyty handles input events, settings, and update checks.
