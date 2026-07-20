@@ -51,7 +51,7 @@ If the app is still listed in System Settings but macOS does not deliver input e
 2. Run:
 
    ```bash
-   tccutil reset Accessibility io.github.keyty
+   tccutil reset Accessibility app.keyty.Keyty
    ```
 
 3. Launch Keyty.
