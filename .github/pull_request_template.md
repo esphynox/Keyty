@@ -14,10 +14,6 @@ Run project commands from `Apps/Keyty`.
 
 Attach screenshots or screen recordings for visible UI changes. Write `N/A` if there are none.
 
-## Privacy and Permissions
-
-Describe any effect on input capture, local settings, update checks, signing, or macOS permissions. Write `N/A` if there is none.
-
 ## Documentation
 
 - [ ] Updated relevant docs
