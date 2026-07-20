@@ -196,9 +196,7 @@ def marketing_version
 end
 
 def build_number
-  return validated_build_number(ENV["GITHUB_RUN_NUMBER"], "GITHUB_RUN_NUMBER") if ENV["GITHUB_RUN_NUMBER"]
-
-  current_build_number.next.to_s
+  current_build_number.to_s
 end
 
 def current_build_number
