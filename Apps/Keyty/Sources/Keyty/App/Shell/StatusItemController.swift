@@ -43,7 +43,6 @@ final class StatusItemController {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         item.menu = self.menu
         item.button?.image = self.statusItemImage
-        item.button?.cell?.isHighlighted = true
         self.statusItem = item
     }
 
