@@ -74,6 +74,7 @@ struct AboutWindowView: View {
                                 .foregroundColor(self.viewModel.selectedTab == tab ? Color.Theme.Text.sidebarItemSelected : Color.Theme.Text.sidebarItem)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, Spacing.xs)
+                                .contentShape(Capsule())
                         }
                         .buttonStyle(.plain)
                         .background(self.tabBackground(for: tab))
@@ -89,7 +90,7 @@ struct AboutWindowView: View {
 
     private var detail: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.grid(7)) {
+            LazyVStack(alignment: .leading, spacing: Spacing.grid(7)) {
                 ForEach(self.viewModel.selectedSections) { section in
                     VStack(alignment: .leading, spacing: Spacing.md) {
                         Text(section.title)
@@ -142,10 +143,7 @@ struct AboutWindowView: View {
                         }
 
                         if !section.body.isEmpty {
-                            Text(section.body)
-                                .font(.system(size: 11, weight: .regular, design: .rounded))
-                                .foregroundColor(Color.Theme.Text.secondary)
-                                .fixedSize(horizontal: false, vertical: true)
+                            Self.AboutBodyText(text: section.body)
                         }
                     }
                 }
@@ -170,6 +168,28 @@ struct AboutWindowView: View {
         } else {
             Capsule()
                 .fill(Color.clear)
+        }
+    }
+}
+
+private extension AboutWindowView {
+    struct AboutBodyText: View {
+        let text: String
+
+        var body: some View {
+            LazyVStack(alignment: .leading, spacing: Spacing.none) {
+                ForEach(Array(self.text.components(separatedBy: .newlines).enumerated()), id: \.offset) { _, line in
+                    if line.isEmpty {
+                        Spacer()
+                            .frame(height: Spacing.xs)
+                    } else {
+                        Text(line)
+                            .font(.system(size: 11, weight: .regular, design: .rounded))
+                            .foregroundColor(Color.Theme.Text.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
         }
     }
 }
