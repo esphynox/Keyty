@@ -74,6 +74,7 @@ struct AboutWindowView: View {
                                 .foregroundColor(self.viewModel.selectedTab == tab ? Color.Theme.Text.sidebarItemSelected : Color.Theme.Text.sidebarItem)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, Spacing.xs)
+                                .contentShape(Capsule())
                         }
                         .buttonStyle(.plain)
                         .background(self.tabBackground(for: tab))
