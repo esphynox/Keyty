@@ -36,7 +36,6 @@ extension DisplaysSettingsPane {
                                     self.onSelectScreen(screen)
                                 } label: {
                                     self.displayCard(for: screen, size: frame.size)
-                                        .frame(width: frame.width, height: frame.height)
                                         .contentShape(Rectangle())
                                 }
                                 .position(x: frame.midX, y: frame.midY)
@@ -69,6 +68,7 @@ private extension DisplaysSettingsPane.PreviewCard {
                     .shadow(color: Color.Theme.Shadow.displayMarker, radius: 6, y: 2)
             }
         }
+        .frame(width: size.width, height: size.height)
         .clipShape(RoundedRectangle(cornerRadius: self.displayCornerRadius, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: self.displayCornerRadius, style: .continuous)
