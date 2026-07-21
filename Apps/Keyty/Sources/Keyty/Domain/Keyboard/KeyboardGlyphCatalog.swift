@@ -16,19 +16,19 @@ import Foundation
 ///
 /// It is not a key model, storage type, or event transformer.
 enum KeyboardGlyphCatalog {
-    static let command = KeyboardModifier.command.glyph
-    static let shift = KeyboardModifier.shift.glyph
-    static let option = KeyboardModifier.option.glyph
-    static let control = KeyboardModifier.control.glyph
+    static let command = KeyboardModifierKey.Kind.command.glyph
+    static let shift = KeyboardModifierKey.Kind.shift.glyph
+    static let option = KeyboardModifierKey.Kind.option.glyph
+    static let control = KeyboardModifierKey.Kind.control.glyph
     
     static let tab = UnicodeToken.tab.string
     static let backTab = UnicodeToken.backTab.string
 
     /// Glyphs that can prefix a chord in display strings.
-    static let modifierSymbols: [String] = KeyboardModifier.allCases.map(\.glyph)
+    static let modifierSymbols: [String] = KeyboardModifierKey.Kind.allCases.map(\.glyph)
 
     /// Physical key codes for left and right command, shift, option, and control keys.
-    static let modifierKeyCodes: Set<KeyboardKeyCode> = Set(KeyboardModifier.allCases.flatMap(\.keyCodes))
+    static let modifierKeyCodes: Set<KeyboardKeyCode> = Set(KeyboardModifierKey.Kind.allCases.flatMap(\.keyCodes))
 
     static func isModifierKeyCode(_ rawValue: UInt16) -> Bool {
         guard let keyCode = KeyboardKeyCode(rawValue: rawValue) else { return false }

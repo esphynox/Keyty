@@ -108,15 +108,8 @@ final class EventTap {
     }
 
     fileprivate func handleFlagsChanged(_ cgEvent: CGEvent) {
-        let f = cgEvent.flags
-        var modifiers: NSEvent.ModifierFlags = []
-        if f.contains(.maskAlphaShift) { modifiers.insert(.capsLock) }
-        if f.contains(.maskShift)      { modifiers.insert(.shift) }
-        if f.contains(.maskCommand)    { modifiers.insert(.command) }
-        if f.contains(.maskControl)    { modifiers.insert(.control) }
-        if f.contains(.maskAlternate)  { modifiers.insert(.option) }
-        if f.contains(.maskSecondaryFn) { modifiers.insert(.function) }
-        self.delegate?.eventTap(self, noteFlagsChanged: modifiers)
+        let flags = NSEvent.ModifierFlags(rawValue: UInt(cgEvent.flags.rawValue))
+        self.delegate?.eventTap(self, noteFlagsChanged: flags)
     }
 
     fileprivate func handleMouseEvent(_ cgEvent: CGEvent) {

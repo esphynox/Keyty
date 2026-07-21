@@ -46,7 +46,7 @@ final class KeycapEventCoordinatorTests: XCTestCase {
 
         XCTAssertEqual(appendedGroups.count, 2)
         XCTAssertEqual(appendedGroups[0].map(\.identity), [.keyCode(8)])
-        XCTAssertEqual(appendedGroups[1].map(\.identity), [.modifier(.command)])
+        XCTAssertEqual(appendedGroups[1].map(\.identity), [.modifier(.leftCommand)])
         XCTAssertTrue(updatedGroups.isEmpty)
     }
 
@@ -87,7 +87,7 @@ final class KeycapEventCoordinatorTests: XCTestCase {
 
         XCTAssertEqual(appendedGroups.count, 1)
         XCTAssertEqual(updatedGroups.count, 1)
-        XCTAssertEqual(updatedGroups[0].map(\.identity), [.modifier(.command), .modifier(.shift)])
+        XCTAssertEqual(updatedGroups[0].map(\.identity), [.modifier(.leftCommand), .modifier(.leftShift)])
     }
 
     func testTrackedKeyUpdateDoesNotAppendLaterModifierToExistingKeyGroup() {
@@ -127,7 +127,7 @@ final class KeycapEventCoordinatorTests: XCTestCase {
             keyCode: 8,
             isKeyDown: false,
             items: [
-                TestItem(identity: .modifier(.command)),
+                TestItem(identity: .modifier(.leftCommand)),
                 TestItem(identity: .keyCode(8))
             ],
             appendGroup: {
@@ -141,7 +141,7 @@ final class KeycapEventCoordinatorTests: XCTestCase {
 
         XCTAssertEqual(appendedGroups.count, 2)
         XCTAssertEqual(appendedGroups[0].map(\.identity), [.keyCode(8)])
-        XCTAssertEqual(appendedGroups[1].map(\.identity), [.modifier(.command)])
+        XCTAssertEqual(appendedGroups[1].map(\.identity), [.modifier(.leftCommand)])
         XCTAssertEqual(updatedGroups.count, 1)
         XCTAssertEqual(updatedGroups[0].map(\.identity), [.keyCode(8)])
     }
@@ -181,7 +181,7 @@ final class KeycapEventCoordinatorTests: XCTestCase {
 
         XCTAssertEqual(appendedGroups.count, 2)
         XCTAssertEqual(appendedGroups[0].map(\.identity), [.keyCode(1)])
-        XCTAssertEqual(appendedGroups[1].map(\.identity), [.modifier(.command)])
+        XCTAssertEqual(appendedGroups[1].map(\.identity), [.modifier(.leftCommand)])
         XCTAssertTrue(updatedGroups.isEmpty)
     }
 
@@ -209,7 +209,7 @@ final class KeycapEventCoordinatorTests: XCTestCase {
             keyCode: 8,
             isKeyDown: true,
             items: [
-                TestItem(identity: .modifier(.command), isPressed: true),
+                TestItem(identity: .modifier(.leftCommand), isPressed: true),
                 TestItem(identity: .keyCode(8), isPressed: true)
             ],
             appendGroup: {
@@ -238,9 +238,9 @@ final class KeycapEventCoordinatorTests: XCTestCase {
 
         XCTAssertEqual(appendedGroups.count, 1)
         XCTAssertEqual(updatedGroups.count, 2)
-        XCTAssertEqual(updatedGroups[0].map(\.identity), [.modifier(.command), .keyCode(8)])
-        XCTAssertEqual(updatedGroups[1].map(\.identity), [.modifier(.command), .keyCode(8)])
-        XCTAssertEqual(updatedGroups[1].first(where: { $0.identity == .modifier(.command) })?.isPressed, false)
+        XCTAssertEqual(updatedGroups[0].map(\.identity), [.modifier(.leftCommand), .keyCode(8)])
+        XCTAssertEqual(updatedGroups[1].map(\.identity), [.modifier(.leftCommand), .keyCode(8)])
+        XCTAssertEqual(updatedGroups[1].first(where: { $0.identity == .modifier(.leftCommand) })?.isPressed, false)
     }
 
     func testNextModifiedKeyStartsNewGroupWhileModifiersRemainHeld() {
@@ -267,8 +267,8 @@ final class KeycapEventCoordinatorTests: XCTestCase {
             keyCode: 29,
             isKeyDown: true,
             items: [
-                TestItem(identity: .modifier(.command), isPressed: true),
-                TestItem(identity: .modifier(.shift), isPressed: true),
+                TestItem(identity: .modifier(.leftCommand), isPressed: true),
+                TestItem(identity: .modifier(.leftShift), isPressed: true),
                 TestItem(identity: .keyCode(29), isPressed: true)
             ],
             appendGroup: {
@@ -284,8 +284,8 @@ final class KeycapEventCoordinatorTests: XCTestCase {
             keyCode: 29,
             isKeyDown: false,
             items: [
-                TestItem(identity: .modifier(.command), isPressed: true),
-                TestItem(identity: .modifier(.shift), isPressed: true),
+                TestItem(identity: .modifier(.leftCommand), isPressed: true),
+                TestItem(identity: .modifier(.leftShift), isPressed: true),
                 TestItem(identity: .keyCode(29), isPressed: false)
             ],
             appendGroup: {
@@ -301,8 +301,8 @@ final class KeycapEventCoordinatorTests: XCTestCase {
             keyCode: 18,
             isKeyDown: true,
             items: [
-                TestItem(identity: .modifier(.command), isPressed: true),
-                TestItem(identity: .modifier(.shift), isPressed: true),
+                TestItem(identity: .modifier(.leftCommand), isPressed: true),
+                TestItem(identity: .modifier(.leftShift), isPressed: true),
                 TestItem(identity: .keyCode(18), isPressed: true)
             ],
             appendGroup: {
@@ -315,10 +315,10 @@ final class KeycapEventCoordinatorTests: XCTestCase {
         )
 
         XCTAssertEqual(appendedGroups.count, 2)
-        XCTAssertEqual(appendedGroups[0].map(\.identity), [.modifier(.command), .modifier(.shift)])
-        XCTAssertEqual(updatedGroups[0].map(\.identity), [.modifier(.command), .modifier(.shift), .keyCode(29)])
-        XCTAssertEqual(updatedGroups[1].map(\.identity), [.modifier(.command), .modifier(.shift), .keyCode(29)])
-        XCTAssertEqual(appendedGroups[1].map(\.identity), [.modifier(.command), .modifier(.shift), .keyCode(18)])
+        XCTAssertEqual(appendedGroups[0].map(\.identity), [.modifier(.leftCommand), .modifier(.leftShift)])
+        XCTAssertEqual(updatedGroups[0].map(\.identity), [.modifier(.leftCommand), .modifier(.leftShift), .keyCode(29)])
+        XCTAssertEqual(updatedGroups[1].map(\.identity), [.modifier(.leftCommand), .modifier(.leftShift), .keyCode(29)])
+        XCTAssertEqual(appendedGroups[1].map(\.identity), [.modifier(.leftCommand), .modifier(.leftShift), .keyCode(18)])
     }
 
     func testStandaloneItemAbsorbsExistingModifierGroup() {
@@ -353,9 +353,9 @@ final class KeycapEventCoordinatorTests: XCTestCase {
         )
 
         XCTAssertEqual(appendedGroups.count, 1)
-        XCTAssertEqual(appendedGroups[0].map(\.identity), [.modifier(.command), .modifier(.shift)])
+        XCTAssertEqual(appendedGroups[0].map(\.identity), [.modifier(.leftCommand), .modifier(.leftShift)])
         XCTAssertEqual(updatedGroups.count, 1)
-        XCTAssertEqual(updatedGroups[0].map(\.identity), [.modifier(.command), .modifier(.shift), .mouse(.leftButton)])
+        XCTAssertEqual(updatedGroups[0].map(\.identity), [.modifier(.leftCommand), .modifier(.leftShift), .mouse(.leftButton)])
     }
 
     func testMouseButtonReleaseUpdatesExistingChordGroup() {
@@ -382,7 +382,7 @@ final class KeycapEventCoordinatorTests: XCTestCase {
             kind: .leftButton,
             isPressed: true,
             items: [
-                TestItem(identity: .modifier(.command), isPressed: true),
+                TestItem(identity: .modifier(.leftCommand), isPressed: true),
                 TestItem(identity: .mouse(.leftButton), isPressed: true)
             ],
             appendGroup: {
@@ -398,7 +398,7 @@ final class KeycapEventCoordinatorTests: XCTestCase {
             kind: .leftButton,
             isPressed: false,
             items: [
-                TestItem(identity: .modifier(.command), isPressed: true),
+                TestItem(identity: .modifier(.leftCommand), isPressed: true),
                 TestItem(identity: .mouse(.leftButton), isPressed: false)
             ],
             appendGroup: {
@@ -411,11 +411,11 @@ final class KeycapEventCoordinatorTests: XCTestCase {
         )
 
         XCTAssertEqual(appendedGroups.count, 1)
-        XCTAssertEqual(appendedGroups[0].map(\.identity), [.modifier(.command)])
+        XCTAssertEqual(appendedGroups[0].map(\.identity), [.modifier(.leftCommand)])
         XCTAssertEqual(updatedGroups.count, 2)
-        XCTAssertEqual(updatedGroups[0].map(\.identity), [.modifier(.command), .mouse(.leftButton)])
+        XCTAssertEqual(updatedGroups[0].map(\.identity), [.modifier(.leftCommand), .mouse(.leftButton)])
         XCTAssertEqual(updatedGroups[0].first(where: { $0.identity == .mouse(.leftButton) })?.isPressed, true)
-        XCTAssertEqual(updatedGroups[1].map(\.identity), [.modifier(.command), .mouse(.leftButton)])
+        XCTAssertEqual(updatedGroups[1].map(\.identity), [.modifier(.leftCommand), .mouse(.leftButton)])
         XCTAssertEqual(updatedGroups[1].first(where: { $0.identity == .mouse(.leftButton) })?.isPressed, false)
     }
 
@@ -425,16 +425,16 @@ final class KeycapEventCoordinatorTests: XCTestCase {
     ) -> [TestItem] {
         var items: [TestItem] = []
         if currentFlags.contains(.command) || releasedFlags.contains(.command) {
-            items.append(TestItem(identity: .modifier(.command), isPressed: currentFlags.contains(.command)))
+            items.append(TestItem(identity: .modifier(.leftCommand), isPressed: currentFlags.contains(.command)))
         }
         if currentFlags.contains(.shift) || releasedFlags.contains(.shift) {
-            items.append(TestItem(identity: .modifier(.shift), isPressed: currentFlags.contains(.shift)))
+            items.append(TestItem(identity: .modifier(.leftShift), isPressed: currentFlags.contains(.shift)))
         }
         if currentFlags.contains(.option) || releasedFlags.contains(.option) {
-            items.append(TestItem(identity: .modifier(.option), isPressed: currentFlags.contains(.option)))
+            items.append(TestItem(identity: .modifier(.leftOption), isPressed: currentFlags.contains(.option)))
         }
         if currentFlags.contains(.control) || releasedFlags.contains(.control) {
-            items.append(TestItem(identity: .modifier(.control), isPressed: currentFlags.contains(.control)))
+            items.append(TestItem(identity: .modifier(.leftControl), isPressed: currentFlags.contains(.control)))
         }
         return items
     }
