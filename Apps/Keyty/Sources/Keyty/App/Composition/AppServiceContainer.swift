@@ -39,12 +39,15 @@ final class AppServiceContainer {
         self.keyboardVisualizer = keyboardVisualizer
         self.shortcutManager = shortcutManager
         self.presenceManager = presenceManager
-        self.captureController = CaptureController(
-            shortcutManager: shortcutManager,
+        let captureController = CaptureController(
             presenceManager: presenceManager,
             pointerVisualizersManager: pointerVisualizersManager,
             keyboardVisualizer: keyboardVisualizer,
             permissionsService: permissionsService
         )
+        shortcutManager.onToggleCapturingShortcut = { [weak captureController] in
+            captureController?.toggleCapturing()
+        }
+        self.captureController = captureController
     }
 }

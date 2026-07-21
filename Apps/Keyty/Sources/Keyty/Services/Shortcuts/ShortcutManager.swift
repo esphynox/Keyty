@@ -9,12 +9,22 @@
 import Cocoa
 import ShortcutRecorder
 
+protocol GlobalShortcutMonitoring: AnyObject {
+    func addAction(_ action: ShortcutAction, forKeyEvent keyEvent: KeyEventType)
+    func removeAction(_ action: ShortcutAction)
+}
+
+extension GlobalShortcutMonitor: GlobalShortcutMonitoring {}
+
 final class ShortcutManager: NSObject {
     weak var statusShortcutItem: NSMenuItem?
     weak var dockShortcutItem: NSMenuItem?
+    var onToggleCapturingShortcut: (() -> Void)?
 
     private let settings: any ShortcutSettingsProtocol
+    private let globalShortcutMonitor: any GlobalShortcutMonitoring
     private var _toggleCapturingShortcut: Shortcut?
+    private var toggleCapturingShortcutAction: ShortcutAction?
 
     var toggleCapturingShortcut: Shortcut? {
         get {
@@ -26,12 +36,24 @@ final class ShortcutManager: NSObject {
         set {
             self._toggleCapturingShortcut = self.persistShortcut(newValue)
             self.refreshMenuItems()
+            self.refreshGlobalShortcut()
         }
     }
 
-    init(settings: any ShortcutSettingsProtocol = ShortcutSettings()) {
+    init(
+        settings: any ShortcutSettingsProtocol = ShortcutSettings(),
+        globalShortcutMonitor: any GlobalShortcutMonitoring = GlobalShortcutMonitor.shared
+    ) {
         self.settings = settings
+        self.globalShortcutMonitor = globalShortcutMonitor
         super.init()
+        self.refreshGlobalShortcut()
+    }
+
+    deinit {
+        if let action = self.toggleCapturingShortcutAction {
+            self.globalShortcutMonitor.removeAction(action)
+        }
     }
 
     func configureToggleShortcutRecorder(_ recorder: RecorderControl) {
@@ -80,6 +102,24 @@ final class ShortcutManager: NSObject {
         } catch {
             return self.shortcutFromSettings()
         }
+    }
+
+    private func refreshGlobalShortcut() {
+        if let action = self.toggleCapturingShortcutAction {
+            self.globalShortcutMonitor.removeAction(action)
+        }
+
+        guard let shortcut = self.toggleCapturingShortcut else {
+            self.toggleCapturingShortcutAction = nil
+            return
+        }
+
+        let action = ShortcutAction(shortcut: shortcut) { [weak self] _ in
+            self?.onToggleCapturingShortcut?()
+            return true
+        }
+        self.toggleCapturingShortcutAction = action
+        self.globalShortcutMonitor.addAction(action, forKeyEvent: .down)
     }
 }
 
