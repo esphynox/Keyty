@@ -19,8 +19,8 @@ enum PointerRingSettingsKeys {
     static let defaultIsEnabled = false
     static let defaultAlwaysVisible = false
     static let defaultColor = automaticVisualizerColor.hexString
-    static let defaultSize = CGFloat(44)
-    static let defaultThickness = CGFloat(2)
+    static let defaultSize = CGFloat(75)
+    static let defaultThickness = CGFloat(5)
     static let defaultShape = PointerRingShape.circle
     static let sizeRange: ClosedRange<CGFloat> = 24...96
     static let thicknessRange: ClosedRange<CGFloat> = 1...12
