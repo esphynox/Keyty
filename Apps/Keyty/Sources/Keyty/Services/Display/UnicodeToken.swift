@@ -32,10 +32,11 @@ enum UnicodeToken {
     static let pageUp: Unicode.Scalar = "\u{21DE}"
     static let pageDown: Unicode.Scalar = "\u{21DF}"
 
-    static let leftArrow: Unicode.Scalar = "\u{2190}"
-    static let rightArrow: Unicode.Scalar = "\u{2192}"
-    static let upArrow: Unicode.Scalar = "\u{2191}"
-    static let downArrow: Unicode.Scalar = "\u{2193}"
+    static let leftArrow: Unicode.Scalar = "\u{25C0}"
+    static let rightArrow: Unicode.Scalar = "\u{25B6}"
+    static let upArrow: Unicode.Scalar = "\u{25B2}"
+    static let downArrow: Unicode.Scalar = "\u{25BC}"
+    
     static let upLeftArrow: Unicode.Scalar = "\u{2196}"
     static let upRightArrow: Unicode.Scalar = "\u{2197}"
     static let downLeftArrow: Unicode.Scalar = "\u{2199}"
@@ -66,5 +67,6 @@ enum UnicodeToken {
     static let fastForward: Unicode.Scalar = "\u{23E9}"
     static let rewind: Unicode.Scalar = "\u{23EA}"
     static let eject: Unicode.Scalar = "\u{23CF}"
+    
     static let musicNote: Unicode.Scalar = "\u{266A}"
 }
