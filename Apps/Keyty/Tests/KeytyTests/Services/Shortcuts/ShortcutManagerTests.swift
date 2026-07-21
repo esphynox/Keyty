@@ -14,28 +14,37 @@ final class ShortcutManagerTests: XCTestCase {
     private var store: InMemoryKeyValueStore!
     private var settings: ShortcutSettings!
     private var globalShortcutMonitor: FakeGlobalShortcutMonitor!
+    private var shortcutValidator: FakeShortcutValidator!
+    private var menuItemPresenter: FakeShortcutMenuItemPresenter!
     private var manager: ShortcutManager!
+    private var toggleCount: Int!
 
     override func setUp() {
         super.setUp()
-        store = InMemoryKeyValueStore()
-        settings = ShortcutSettings(store: store)
-        settings.registerDefaults()
-        globalShortcutMonitor = FakeGlobalShortcutMonitor()
-        manager = ShortcutManager(settings: settings, globalShortcutMonitor: globalShortcutMonitor)
+        self.store = InMemoryKeyValueStore()
+        self.settings = ShortcutSettings(store: self.store)
+        self.settings.registerDefaults()
+        self.globalShortcutMonitor = FakeGlobalShortcutMonitor()
+        self.shortcutValidator = FakeShortcutValidator()
+        self.menuItemPresenter = FakeShortcutMenuItemPresenter()
+        self.toggleCount = 0
+        self.manager = self.makeManager()
     }
 
     override func tearDown() {
-        manager = nil
-        globalShortcutMonitor = nil
-        settings = nil
-        store = nil
+        self.manager = nil
+        self.toggleCount = nil
+        self.menuItemPresenter = nil
+        self.shortcutValidator = nil
+        self.globalShortcutMonitor = nil
+        self.settings = nil
+        self.store = nil
         super.tearDown()
     }
 
     func testRegistersDefaultShortcutData() {
         XCTAssertEqual(
-            store.data(forKey: ShortcutSettings.capturingHotKeyKey),
+            self.store.data(forKey: ShortcutSettings.capturingHotKeyKey),
             ShortcutArchiver.defaultData()
         )
     }
@@ -48,19 +57,19 @@ final class ShortcutManagerTests: XCTestCase {
             charactersIgnoringModifiers: nil
         )
 
-        manager.toggleCapturingShortcut = shortcut
+        self.manager.toggleCapturingShortcut = shortcut
 
         XCTAssertEqual(
-            store.data(forKey: ShortcutSettings.capturingHotKeyKey),
+            self.store.data(forKey: ShortcutSettings.capturingHotKeyKey),
             try ShortcutArchiver.data(for: shortcut)
         )
     }
 
     func testClearingShortcutRevertsToDefaultData() {
-        manager.toggleCapturingShortcut = nil
+        self.manager.toggleCapturingShortcut = nil
 
         XCTAssertEqual(
-            store.data(forKey: ShortcutSettings.capturingHotKeyKey),
+            self.store.data(forKey: ShortcutSettings.capturingHotKeyKey),
             ShortcutArchiver.defaultData()
         )
     }
@@ -72,25 +81,25 @@ final class ShortcutManagerTests: XCTestCase {
             characters: nil,
             charactersIgnoringModifiers: nil
         )
-        store.set(try ShortcutArchiver.data(for: shortcut), forKey: ShortcutSettings.capturingHotKeyKey)
+        self.store.set(try ShortcutArchiver.data(for: shortcut), forKey: ShortcutSettings.capturingHotKeyKey)
 
-        manager = ShortcutManager(settings: settings, globalShortcutMonitor: globalShortcutMonitor)
+        self.manager = self.makeManager()
 
-        XCTAssertEqual(manager.toggleCapturingShortcut, shortcut)
+        XCTAssertEqual(self.manager.toggleCapturingShortcut, shortcut)
     }
 
     func testFallsBackToDefaultShortcutWhenStoredDataIsInvalid() {
-        store.set(Data([0x00, 0x01, 0x02]), forKey: ShortcutSettings.capturingHotKeyKey)
+        self.store.set(Data([0x00, 0x01, 0x02]), forKey: ShortcutSettings.capturingHotKeyKey)
 
-        manager = ShortcutManager(settings: settings, globalShortcutMonitor: globalShortcutMonitor)
+        self.manager = self.makeManager()
 
-        XCTAssertEqual(manager.toggleCapturingShortcut, ShortcutArchiver.defaultShortcut())
+        XCTAssertEqual(self.manager.toggleCapturingShortcut, ShortcutArchiver.defaultShortcut())
     }
 
     func testRegistersGlobalShortcutAtStartup() {
-        XCTAssertEqual(globalShortcutMonitor.addedActions.count, 1)
-        XCTAssertEqual(globalShortcutMonitor.addedActions.first?.shortcut, ShortcutArchiver.defaultShortcut())
-        XCTAssertEqual(globalShortcutMonitor.addedKeyEvents, [.down])
+        XCTAssertEqual(self.globalShortcutMonitor.addedActions.count, 1)
+        XCTAssertEqual(self.globalShortcutMonitor.addedActions.first?.shortcut, ShortcutArchiver.defaultShortcut())
+        XCTAssertEqual(self.globalShortcutMonitor.addedKeyEvents, [.down])
     }
 
     func testUpdatesRegisteredGlobalShortcutWhenShortcutChanges() {
@@ -101,28 +110,97 @@ final class ShortcutManagerTests: XCTestCase {
             charactersIgnoringModifiers: nil
         )
 
-        manager.toggleCapturingShortcut = shortcut
+        self.manager.toggleCapturingShortcut = shortcut
 
-        XCTAssertEqual(globalShortcutMonitor.removedActions.count, 1)
-        XCTAssertEqual(globalShortcutMonitor.addedActions.count, 2)
-        XCTAssertEqual(globalShortcutMonitor.addedActions.last?.shortcut, shortcut)
+        XCTAssertEqual(self.globalShortcutMonitor.removedActions.count, 1)
+        XCTAssertEqual(self.globalShortcutMonitor.addedActions.count, 2)
+        XCTAssertEqual(self.globalShortcutMonitor.addedActions.last?.shortcut, shortcut)
+    }
+
+    func testDoesNotUpdateRegisteredGlobalShortcutWhenShortcutIsUnchanged() {
+        let shortcut = ShortcutArchiver.defaultShortcut()
+
+        self.manager.toggleCapturingShortcut = shortcut
+
+        XCTAssertEqual(self.globalShortcutMonitor.removedActions.count, 0)
+        XCTAssertEqual(self.globalShortcutMonitor.addedActions.count, 1)
     }
 
     func testGlobalShortcutActionTogglesCapturing() {
-        var toggleCount = 0
-        manager.onToggleCapturingShortcut = {
-            toggleCount += 1
-        }
+        self.globalShortcutMonitor.performLastAction()
 
-        globalShortcutMonitor.performLastAction()
-
-        XCTAssertEqual(toggleCount, 1)
+        XCTAssertEqual(self.toggleCount, 1)
     }
 
     func testUnregistersGlobalShortcutOnDeinit() {
-        manager = nil
+        self.manager = nil
 
-        XCTAssertEqual(globalShortcutMonitor.removedActions.count, 1)
+        XCTAssertEqual(self.globalShortcutMonitor.removedActions.count, 1)
+    }
+
+    func testDisplaysShortcutInMenuItemsAtStartup() {
+        XCTAssertEqual(self.menuItemPresenter.displayedShortcuts, [ShortcutArchiver.defaultShortcut()])
+    }
+
+    func testRejectsInvalidShortcutWithoutPersistingOrRegistering() {
+        let shortcut = Shortcut(
+            code: .ansiA,
+            modifierFlags: [.command, .option],
+            characters: nil,
+            charactersIgnoringModifiers: nil
+        )
+        self.shortcutValidator.validationMessages[shortcut] = "Already used"
+
+        self.manager.toggleCapturingShortcut = shortcut
+
+        XCTAssertEqual(self.manager.shortcutValidationMessage, "Already used")
+        XCTAssertEqual(self.manager.toggleCapturingShortcut, ShortcutArchiver.defaultShortcut())
+        XCTAssertEqual(self.globalShortcutMonitor.addedActions.count, 1)
+        XCTAssertEqual(self.globalShortcutMonitor.removedActions.count, 0)
+    }
+
+    func testReportsInvalidStoredShortcutWithoutRegisteringIt() throws {
+        let shortcut = Shortcut(
+            code: .ansiB,
+            modifierFlags: [.control, .shift],
+            characters: nil,
+            charactersIgnoringModifiers: nil
+        )
+        self.store.set(try ShortcutArchiver.data(for: shortcut), forKey: ShortcutSettings.capturingHotKeyKey)
+        self.shortcutValidator.validationMessages[shortcut] = "Unavailable"
+
+        self.manager = self.makeManager()
+
+        XCTAssertEqual(self.manager.shortcutValidationMessage, "Unavailable")
+        XCTAssertEqual(self.globalShortcutMonitor.addedActions.count, 1)
+        XCTAssertEqual(self.globalShortcutMonitor.addedActions.first?.shortcut, ShortcutArchiver.defaultShortcut())
+    }
+
+    func testRecorderValidationRejectsInvalidShortcut() {
+        let shortcut = Shortcut(
+            code: .ansiA,
+            modifierFlags: [.command, .option],
+            characters: nil,
+            charactersIgnoringModifiers: nil
+        )
+        self.shortcutValidator.validationMessages[shortcut] = "Conflict"
+
+        let canRecord = self.manager.recorderControl(RecorderControl(frame: .zero), canRecord: shortcut)
+
+        XCTAssertFalse(canRecord)
+        XCTAssertEqual(self.manager.shortcutValidationMessage, "Conflict")
+    }
+
+    private func makeManager() -> ShortcutManager {
+        ShortcutManager(
+            settings: self.settings,
+            globalShortcutMonitor: self.globalShortcutMonitor,
+            shortcutValidator: self.shortcutValidator,
+            menuItemPresenter: self.menuItemPresenter,
+            onToggleCapturingShortcut: { [weak self] in
+                self?.toggleCount += 1
+            }
+        )
     }
 }
 
@@ -142,5 +220,21 @@ private final class FakeGlobalShortcutMonitor: GlobalShortcutMonitoring {
 
     func performLastAction() {
         self.addedActions.last?.perform(onTarget: nil)
+    }
+}
+
+private final class FakeShortcutValidator: ShortcutValidating {
+    var validationMessages: [Shortcut: String] = [:]
+
+    func validationMessage(for shortcut: Shortcut) -> String? {
+        self.validationMessages[shortcut]
+    }
+}
+
+private final class FakeShortcutMenuItemPresenter: ShortcutMenuItemPresenting {
+    private(set) var displayedShortcuts: [Shortcut?] = []
+
+    func displayShortcut(_ shortcut: Shortcut?) {
+        self.displayedShortcuts.append(shortcut)
     }
 }

@@ -9,23 +9,28 @@
 import Cocoa
 import ShortcutRecorder
 
-protocol GlobalShortcutMonitoring: AnyObject {
-    func addAction(_ action: ShortcutAction, forKeyEvent keyEvent: KeyEventType)
-    func removeAction(_ action: ShortcutAction)
-}
-
-extension GlobalShortcutMonitor: GlobalShortcutMonitoring {}
-
+/// Manages the toggle-capturing shortcut across persistence, menu presentation, recorder validation, and global registration.
 final class ShortcutManager: NSObject {
-    weak var statusShortcutItem: NSMenuItem?
-    weak var dockShortcutItem: NSMenuItem?
-    var onToggleCapturingShortcut: (() -> Void)?
+    /// The latest shortcut validation error shown in settings, or `nil` when the current shortcut is valid.
+    private(set) var shortcutValidationMessage: String? {
+        didSet {
+            guard oldValue != self.shortcutValidationMessage else { return }
+            self.onShortcutValidationMessageChanged?(self.shortcutValidationMessage)
+        }
+    }
+
+    /// Called when `shortcutValidationMessage` changes.
+    var onShortcutValidationMessageChanged: ((String?) -> Void)?
 
     private let settings: any ShortcutSettingsProtocol
     private let globalShortcutMonitor: any GlobalShortcutMonitoring
+    private let shortcutValidator: any ShortcutValidating
+    private let menuItemPresenter: any ShortcutMenuItemPresenting
+    private let onToggleCapturingShortcut: () -> Void
     private var _toggleCapturingShortcut: Shortcut?
     private var toggleCapturingShortcutAction: ShortcutAction?
 
+    /// The shortcut assigned to toggle capturing, loaded from settings on first read and persisted on update.
     var toggleCapturingShortcut: Shortcut? {
         get {
             if self._toggleCapturingShortcut == nil {
@@ -34,20 +39,25 @@ final class ShortcutManager: NSObject {
             return self._toggleCapturingShortcut
         }
         set {
-            self._toggleCapturingShortcut = self.persistShortcut(newValue)
-            self.refreshMenuItems()
-            self.refreshGlobalShortcut()
+            self.setToggleCapturingShortcut(newValue)
         }
     }
 
     init(
         settings: any ShortcutSettingsProtocol = ShortcutSettings(),
-        globalShortcutMonitor: any GlobalShortcutMonitoring = GlobalShortcutMonitor.shared
+        globalShortcutMonitor: any GlobalShortcutMonitoring = GlobalShortcutMonitor.shared,
+        shortcutValidator: any ShortcutValidating = ShortcutValidator(),
+        menuItemPresenter: any ShortcutMenuItemPresenting,
+        onToggleCapturingShortcut: @escaping () -> Void
     ) {
         self.settings = settings
         self.globalShortcutMonitor = globalShortcutMonitor
+        self.shortcutValidator = shortcutValidator
+        self.menuItemPresenter = menuItemPresenter
+        self.onToggleCapturingShortcut = onToggleCapturingShortcut
         super.init()
-        self.refreshGlobalShortcut()
+        self.refreshMenuItems()
+        self.refreshGlobalShortcutIfNeeded()
     }
 
     deinit {
@@ -62,27 +72,12 @@ final class ShortcutManager: NSObject {
     }
 
     func refreshMenuItems() {
-        if let shortcut = self.toggleCapturingShortcut {
-            let keyEquivalent = SymbolicKeyCodeTransformer.shared.transformedValue(NSNumber(value: shortcut.keyCode.rawValue)) ?? ""
-            self.setKeyEquavalent(keyEquivalent)
-            self.setKeyEquivalentModifierMask(shortcut.modifierFlags)
-        } else {
-            self.setKeyEquavalent("")
-            self.setKeyEquivalentModifierMask([])
-        }
+        self.menuItemPresenter.displayShortcut(self.toggleCapturingShortcut)
     }
-    
-    private func setKeyEquavalent(_ keyEquivalent: String) {
-        self.statusShortcutItem?.keyEquivalent = keyEquivalent
-        self.dockShortcutItem?.keyEquivalent = keyEquivalent
-    }
-    
-    private func setKeyEquivalentModifierMask(_ modifierFlags: NSEvent.ModifierFlags) {
-        self.statusShortcutItem?.keyEquivalentModifierMask = modifierFlags
-        self.dockShortcutItem?.keyEquivalentModifierMask = modifierFlags
-    }
+}
 
-    // MARK: - Private
+// MARK: - Logic
+private extension ShortcutManager {
     private func shortcutFromSettings() -> Shortcut? {
         guard let data = self.settings.capturingHotKeyData else {
             return ShortcutArchiver.defaultShortcut()
@@ -104,7 +99,27 @@ final class ShortcutManager: NSObject {
         }
     }
 
-    private func refreshGlobalShortcut() {
+    private func setToggleCapturingShortcut(_ shortcut: Shortcut?) {
+        if let shortcut, let validationMessage = self.shortcutValidator.validationMessage(for: shortcut) {
+            self.shortcutValidationMessage = validationMessage
+            return
+        }
+
+        let currentShortcut = self.toggleCapturingShortcut
+        let persistedShortcut = self.persistShortcut(shortcut)
+        self.shortcutValidationMessage = nil
+
+        guard currentShortcut != persistedShortcut else {
+            self._toggleCapturingShortcut = persistedShortcut
+            return
+        }
+
+        self._toggleCapturingShortcut = persistedShortcut
+        self.refreshMenuItems()
+        self.refreshGlobalShortcutIfNeeded()
+    }
+
+    private func refreshGlobalShortcutIfNeeded() {
         if let action = self.toggleCapturingShortcutAction {
             self.globalShortcutMonitor.removeAction(action)
         }
@@ -114,8 +129,15 @@ final class ShortcutManager: NSObject {
             return
         }
 
+        if let validationMessage = self.shortcutValidator.validationMessage(for: shortcut) {
+            self.shortcutValidationMessage = validationMessage
+            self.toggleCapturingShortcutAction = nil
+            return
+        }
+
+        self.shortcutValidationMessage = nil
         let action = ShortcutAction(shortcut: shortcut) { [weak self] _ in
-            self?.onToggleCapturingShortcut?()
+            self?.onToggleCapturingShortcut()
             return true
         }
         self.toggleCapturingShortcutAction = action
@@ -125,6 +147,17 @@ final class ShortcutManager: NSObject {
 
 // MARK: - SRRecorderControlDelegate
 extension ShortcutManager: RecorderControlDelegate {
+    @objc(recorderControl:canRecordShortcut:)
+    func recorderControl(_ control: RecorderControl, canRecord shortcut: Shortcut) -> Bool {
+        if let validationMessage = self.shortcutValidator.validationMessage(for: shortcut) {
+            self.shortcutValidationMessage = validationMessage
+            return false
+        }
+
+        self.shortcutValidationMessage = nil
+        return true
+    }
+
     @objc func recorderControlDidEndRecording(_ control: RecorderControl) {
         guard let newShortcut = control.objectValue else {
             self.toggleCapturingShortcut = nil

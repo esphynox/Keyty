@@ -53,8 +53,19 @@ struct GeneralSettingsPane: View {
                     title: L10n.General.toggleCapturingLabel,
                     subtitle: L10n.General.toggleCapturingSubtitle
                 ) {
-                    ShortcutRecorderView(shortcutManager: model.shortcutManager)
-                        .frame(Size.Settings.recorder)
+                    VStack(alignment: .trailing, spacing: Spacing.xxs) {
+                        ShortcutRecorderView(shortcutManager: model.shortcutManager)
+                            .frame(Size.Settings.recorder)
+
+                        if let validationMessage = model.shortcutValidationMessage {
+                            Text(validationMessage)
+                                .font(Typography.Settings.rowSubtitle)
+                                .foregroundColor(Color.Theme.State.danger)
+                                .multilineTextAlignment(.trailing)
+                                .frame(width: Size.Control.settingsPickerWidth, alignment: .trailing)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
                 }
             }
         }
