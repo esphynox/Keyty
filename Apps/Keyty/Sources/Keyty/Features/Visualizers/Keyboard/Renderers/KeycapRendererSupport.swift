@@ -18,6 +18,11 @@ func keycapWidth(for item: KeycapItem) -> CGFloat {
         return fixedWidth
     }
 
+    if let modifier = item.identity.modifierKind,
+       let fixedWidth = CommonKeycapMetrics.fixedModifierWidths[modifier] {
+        return fixedWidth
+    }
+
     if let fixedWidth = CommonKeycapMetrics.fixedIdentityWidths[item.identity] {
         return fixedWidth
     }

@@ -7,7 +7,7 @@
 //
 
 /// Alignment preference for legend rendering inside a keycap.
-enum KeycapLegendAlignment {
+enum KeycapLegendAlignment: Equatable {
     case automatic
     case left
     case center

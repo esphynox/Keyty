@@ -13,13 +13,35 @@ import Foundation
 /// This answers "what real input does this keycap represent?" and is used for
 /// semantics-driven behavior such as grouping, width rules, and per-key-type styling.
 enum KeycapIdentity: Hashable {
-    case modifier(KeyboardModifier)
+    case modifier(KeyboardModifierKey)
     case keyCode(UInt16)
     case media(MediaKeyEvent.Kind)
     case mouse(MouseEvent.Kind)
 
     var isModifier: Bool {
-        if case .modifier = self { return true }
-        return false
+        switch self {
+        case .modifier:
+            return true
+        case .keyCode, .media, .mouse:
+            return false
+        }
+    }
+
+    var modifierKind: KeyboardModifierKey.Kind? {
+        switch self {
+        case let .modifier(key):
+            return key.kind
+        case .keyCode, .media, .mouse:
+            return nil
+        }
+    }
+
+    var modifierLocation: KeyboardModifierKey.Location? {
+        switch self {
+        case let .modifier(key):
+            return key.location
+        case .keyCode, .media, .mouse:
+            return nil
+        }
     }
 }

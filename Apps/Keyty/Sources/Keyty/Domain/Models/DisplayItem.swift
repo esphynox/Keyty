@@ -55,7 +55,7 @@ public class DisplayItem {
         self.modifierFlags = []
     }
 
-    public init(asFlagsChangedWith modifierFlags: NSEvent.ModifierFlags) {
+    init(asFlagsChangedWith modifierFlags: NSEvent.ModifierFlags) {
         self.kind = .flagsChanged
         self.text = nil
         self.sourceEvent = nil

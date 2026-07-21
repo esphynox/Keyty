@@ -36,15 +36,19 @@ struct KeycapLegend {
     }
 }
 
+// MARK: - Helpers
 extension KeycapLegend {
-    static func modifier(_ modifier: KeyboardModifier) -> KeycapLegend {
+    static func modifier(_ modifier: KeyboardModifierKey.Kind) -> KeycapLegend {
         KeycapLegend(symbol: modifier.glyph, label: modifier.label)
     }
-
+    
     static func character(_ symbol: String) -> KeycapLegend {
         KeycapLegend(symbol: symbol)
     }
+}
 
+// MARK: - Instances
+extension KeycapLegend {
     static let function = KeycapLegend(sfSymbolName: "globe", label: KeyboardKeyCode.function.label, rendersSymbolWithLabel: true)
     static let tab = KeycapLegend(symbol: KeyboardGlyphCatalog.tab, label: KeyboardKeyCode.tab.label)
     static let escape = KeycapLegend(symbol: KeyboardGlyphCatalog.symbol(for: .escape), label: KeyboardKeyCode.escape.label)

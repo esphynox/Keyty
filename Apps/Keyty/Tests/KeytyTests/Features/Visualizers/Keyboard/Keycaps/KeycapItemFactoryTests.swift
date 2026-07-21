@@ -11,6 +11,12 @@ import XCTest
 @testable import Keyty
 
 final class KeycapItemFactoryTests: XCTestCase {
+    func testKeyboardModifierKeysDecodeLocationSpecificFlags() {
+        let flags = Self.flags(.command, masks: UInt(NX_DEVICELCMDKEYMASK), UInt(NX_DEVICERCMDKEYMASK))
+
+        XCTAssertEqual(KeyboardModifierKey.keys(in: flags), [.leftCommand, .rightCommand])
+    }
+
     func testModifierItemsIncludeFunctionKey() {
         let items = KeycapItemFactory.modifierItems(
             currentFlags: [.function],
@@ -23,6 +29,44 @@ final class KeycapItemFactoryTests: XCTestCase {
         XCTAssertEqual(items.first?.label, "fn")
         XCTAssertEqual(items.first?.sfSymbolName, "globe")
         XCTAssertEqual(items.first?.isPressed, true)
+    }
+
+    func testModifierItemsUseLocationSpecificModifierKeys() {
+        let items = KeycapItemFactory.modifierItems(
+            currentFlags: Self.flags(.command, masks: UInt(NX_DEVICELCMDKEYMASK), UInt(NX_DEVICERCMDKEYMASK)),
+            releasedFlags: [],
+            palette: Self.makePalette()
+        )
+
+        XCTAssertEqual(items.map(\.identity), [
+            .modifier(.leftCommand),
+            .modifier(.rightCommand),
+        ])
+        XCTAssertEqual(items.map(\.layoutHints.alignment), [.right, .left])
+    }
+
+    func testModifierItemsUseInwardAlignmentForNonCommandModifierKeys() {
+        let items = KeycapItemFactory.modifierItems(
+            currentFlags: Self.flags(.shift, masks: UInt(NX_DEVICELSHIFTKEYMASK), UInt(NX_DEVICERSHIFTKEYMASK)),
+            releasedFlags: [],
+            palette: Self.makePalette()
+        )
+
+        XCTAssertEqual(items.map(\.identity), [
+            .modifier(.leftShift),
+            .modifier(.rightShift),
+        ])
+        XCTAssertEqual(items.map(\.layoutHints.alignment), [.right, .left])
+    }
+
+    func testModifierItemsFallbackToLeftKeyForAggregateFlags() {
+        let items = KeycapItemFactory.modifierItems(
+            currentFlags: [.command],
+            releasedFlags: [],
+            palette: Self.makePalette()
+        )
+
+        XCTAssertEqual(items.map(\.identity), [.modifier(.leftCommand)])
     }
 
     func testMouseItemUsesPressedStateFromMouseEventType() {
@@ -57,6 +101,10 @@ final class KeycapItemFactoryTests: XCTestCase {
             groupBackgroundTheme: theme,
             legendColorOverride: nil
         )
+    }
+
+    private static func flags(_ flags: NSEvent.ModifierFlags, masks: UInt...) -> NSEvent.ModifierFlags {
+        NSEvent.ModifierFlags(rawValue: masks.reduce(flags.rawValue) { $0 | $1 })
     }
 
     private static func makeMouseEvent(type: NSEvent.EventType) -> MouseEvent {

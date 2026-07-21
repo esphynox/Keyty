@@ -30,6 +30,8 @@ enum KeycapPreviewSample {
 /// `KeycapIdentity`, so per-key-type theming applies uniformly across every branch.
 enum KeycapItemFactory {
     private static let mouseIconHeight: CGFloat = 44
+    private static let orderedModifiers: [KeyboardModifierKey.Kind] = [.command, .shift, .option, .control]
+    private static let orderedModifierLocations: [KeyboardModifierKey.Location] = [.left, .right]
 
     static func keycapItems(for keystroke: StandardKeyEvent, palette: KeycapThemePalette) -> [KeycapItem] {
         Self.keycapItems(
@@ -48,9 +50,8 @@ enum KeycapItemFactory {
         isPressed: Bool,
         palette: KeycapThemePalette
     ) -> [KeycapItem] {
-        let tracked: NSEvent.ModifierFlags = [.command, .shift, .option, .control]
         var result = Self.modifierItems(
-            currentFlags: modifierFlags.intersection(tracked),
+            currentFlags: modifierFlags.subtracting(.function),
             releasedFlags: [],
             palette: palette
         )
@@ -152,18 +153,36 @@ enum KeycapItemFactory {
         palette: KeycapThemePalette
     ) -> [KeycapItem] {
         var items: [KeycapItem] = []
-        if currentFlags.contains(.command) || releasedFlags.contains(.command) {
-            items.append(Self.modifierItem(.command, isPressed: currentFlags.contains(.command), palette: palette))
+        let currentModifierKeys = KeyboardModifierKey.keys(in: currentFlags)
+        let releasedModifierKeys = KeyboardModifierKey.keys(in: releasedFlags)
+
+        for modifier in Self.orderedModifiers {
+            let modifierKeys = Self.orderedModifierKeys(
+                for: modifier,
+                currentModifierKeys: currentModifierKeys,
+                releasedModifierKeys: releasedModifierKeys
+            )
+            if !modifierKeys.isEmpty {
+                for modifierKey in modifierKeys {
+                    items.append(Self.modifierItem(
+                        modifierKey,
+                        isPressed: currentModifierKeys.contains(modifierKey),
+                        palette: palette
+                    ))
+                }
+                continue
+            }
+
+            if currentFlags.contains(modifier.flag) || releasedFlags.contains(modifier.flag) {
+                let modifierKey = KeyboardModifierKey(modifier, location: .left)
+                items.append(Self.modifierItem(
+                    modifierKey,
+                    isPressed: currentFlags.contains(modifier.flag),
+                    palette: palette
+                ))
+            }
         }
-        if currentFlags.contains(.shift) || releasedFlags.contains(.shift) {
-            items.append(Self.modifierItem(.shift, isPressed: currentFlags.contains(.shift), palette: palette))
-        }
-        if currentFlags.contains(.option) || releasedFlags.contains(.option) {
-            items.append(Self.modifierItem(.option, isPressed: currentFlags.contains(.option), palette: palette))
-        }
-        if currentFlags.contains(.control) || releasedFlags.contains(.control) {
-            items.append(Self.modifierItem(.control, isPressed: currentFlags.contains(.control), palette: palette))
-        }
+
         if currentFlags.contains(.function) || releasedFlags.contains(.function) {
             items.append(Self.functionItem(isPressed: currentFlags.contains(.function), palette: palette))
         }
@@ -261,17 +280,29 @@ enum KeycapItemFactory {
     }
 
     private static func modifierItem(
-        _ modifier: KeyboardModifier,
+        _ modifierKey: KeyboardModifierKey,
         isPressed: Bool,
         palette: KeycapThemePalette
     ) -> KeycapItem {
-        let identity = KeycapIdentity.modifier(modifier)
+        let identity = KeycapIdentity.modifier(modifierKey)
         return KeycapItem(
             identity: identity,
-            legend: KeycapLegend(symbol: modifier.glyph, label: modifier.label),
+            legend: KeycapLegend(symbol: modifierKey.kind.glyph, label: modifierKey.kind.label),
             state: KeycapState(isPressed: isPressed),
+            layoutHints: KeycapLayoutHints(alignment: modifierKey.legendAlignment),
             appearance: palette.appearance(for: identity)
         )
+    }
+
+    private static func orderedModifierKeys(
+        for modifier: KeyboardModifierKey.Kind,
+        currentModifierKeys: Set<KeyboardModifierKey>,
+        releasedModifierKeys: Set<KeyboardModifierKey>
+    ) -> [KeyboardModifierKey] {
+        let keys = currentModifierKeys.union(releasedModifierKeys)
+        return Self.orderedModifierLocations
+            .map { KeyboardModifierKey(modifier, location: $0) }
+            .filter { keys.contains($0) }
     }
 
     private static func functionItem(
@@ -298,5 +329,16 @@ enum KeycapItemFactory {
             }
         }
         return remainder.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
+private extension KeyboardModifierKey {
+    var legendAlignment: KeycapLegendAlignment {
+        switch self.location {
+        case .left:
+            return .right
+        case .right:
+            return .left
+        }
     }
 }

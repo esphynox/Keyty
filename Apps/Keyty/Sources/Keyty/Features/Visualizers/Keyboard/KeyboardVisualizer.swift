@@ -14,8 +14,8 @@ final class KeyboardVisualizer {
     private let visualizerSettings: KeyboardVisualizerSettings
     private let visualizerWindow: KeyboardVisualizerWindow
     private let eventCoordinator = KeycapEventCoordinator<KeyboardVisualizerGroupView, KeycapItem>()
-    private var currentTrackedFlags: NSEvent.ModifierFlags = []
-    private var lastTrackedFlags: NSEvent.ModifierFlags = []
+    private var currentModifierFlags: NSEvent.ModifierFlags = []
+    private var lastModifierFlags: NSEvent.ModifierFlags = []
     private var hasPendingGroupBreak = false
 
     convenience init() {
@@ -34,7 +34,7 @@ final class KeyboardVisualizer {
 
     func display(_ item: DisplayItem) {
         if item.kind == .flagsChanged {
-            self.currentTrackedFlags = item.modifierFlags.intersection(Self.trackedModifierFlags)
+            self.currentModifierFlags = item.modifierFlags
             self.displayModifierPreview(item.modifierFlags)
             if self.hasPendingGroupBreak && self.currentTrackedFlags.isEmpty {
                 self.finishCurrentGroup(retaining: [])
@@ -58,7 +58,7 @@ final class KeyboardVisualizer {
             self.prepareForNextContentEvent()
 
             let modifierItems = KeycapItemFactory.modifierItems(
-                currentFlags: mouseEvent.modifierFlags.intersection(Self.trackedModifierFlags),
+                currentFlags: mouseEvent.modifierFlags,
                 releasedFlags: [],
                 palette: self.visualizerSettings.palette
             )
@@ -123,12 +123,13 @@ final class KeyboardVisualizer {
 
     private func displayModifierPreview(_ modifierFlags: NSEvent.ModifierFlags) {
         let currentTrackedFlags = modifierFlags.intersection(Self.trackedModifierFlags)
-        let previousTrackedFlags = self.lastTrackedFlags.intersection(Self.trackedModifierFlags)
+        let previousTrackedFlags = self.lastModifierFlags.intersection(Self.trackedModifierFlags)
         let releasedTrackedFlags = previousTrackedFlags.subtracting(currentTrackedFlags)
+        let releasedModifierFlags = self.lastModifierFlags.subtracting(modifierFlags)
 
         // Caps Lock: one-shot flash, lit when turning on, dim when turning off
         let capsNow = modifierFlags.contains(.capsLock)
-        let capsWas = self.lastTrackedFlags.contains(.capsLock)
+        let capsWas = self.lastModifierFlags.contains(.capsLock)
         if self.visualizerSettings.showSpecialKeys, capsNow != capsWas {
             self.eventCoordinator.handleStandalone(
                 items: [KeycapItem(
@@ -143,11 +144,11 @@ final class KeyboardVisualizer {
             )
         }
 
-        self.lastTrackedFlags = modifierFlags.intersection(Self.trackedModifierFlags.union(.capsLock))
+        self.lastModifierFlags = modifierFlags
 
         let items = KeycapItemFactory.modifierItems(
-            currentFlags: currentTrackedFlags,
-            releasedFlags: releasedTrackedFlags,
+            currentFlags: modifierFlags,
+            releasedFlags: releasedModifierFlags,
             palette: self.visualizerSettings.palette
         )
         guard !items.isEmpty else {
@@ -160,10 +161,10 @@ final class KeyboardVisualizer {
         self.eventCoordinator.handleFlagsChanged(
             currentTrackedFlags: currentTrackedFlags,
             releasedTrackedFlags: releasedTrackedFlags,
-            buildItems: { currentFlags, releasedFlags in
+            buildItems: { _, _ in
                 KeycapItemFactory.modifierItems(
-                    currentFlags: currentFlags,
-                    releasedFlags: releasedFlags,
+                    currentFlags: modifierFlags,
+                    releasedFlags: releasedModifierFlags,
                     palette: self.visualizerSettings.palette
                 )
             },
@@ -174,12 +175,16 @@ final class KeyboardVisualizer {
 
     private func prepareForNextContentEvent() {
         guard self.hasPendingGroupBreak else { return }
-        self.finishCurrentGroup(retaining: self.currentTrackedFlags)
+        self.finishCurrentGroup(retaining: self.currentModifierFlags)
     }
 
-    private func finishCurrentGroup(retaining trackedFlags: NSEvent.ModifierFlags) {
+    private func finishCurrentGroup(retaining modifierFlags: NSEvent.ModifierFlags) {
         self.eventCoordinator.reset()
-        self.lastTrackedFlags = trackedFlags
+        self.lastModifierFlags = modifierFlags
         self.hasPendingGroupBreak = false
+    }
+
+    private var currentTrackedFlags: NSEvent.ModifierFlags {
+        self.currentModifierFlags.intersection(Self.trackedModifierFlags)
     }
 }
