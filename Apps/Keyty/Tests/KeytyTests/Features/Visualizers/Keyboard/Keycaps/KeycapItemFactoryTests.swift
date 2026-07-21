@@ -69,6 +69,32 @@ final class KeycapItemFactoryTests: XCTestCase {
         XCTAssertEqual(items.map(\.identity), [.modifier(.leftCommand)])
     }
 
+    func testReturnAndKeypadEnterRenderDifferentLegends() {
+        let palette = Self.makePalette()
+
+        let returnItems = KeycapItemFactory.keycapItems(
+            keyCode: KeyboardKeyCode.returnKey.rawValue,
+            displayString: KeyboardKeyCode.returnKey.displayText ?? "",
+            modifierFlags: [],
+            isPressed: true,
+            palette: palette
+        )
+        let enterItems = KeycapItemFactory.keycapItems(
+            keyCode: KeyboardKeyCode.keypadEnter.rawValue,
+            displayString: KeyboardKeyCode.keypadEnter.displayText ?? "",
+            modifierFlags: [],
+            isPressed: true,
+            palette: palette
+        )
+
+        XCTAssertEqual(returnItems.map(\.identity), [.keyCode(KeyboardKeyCode.returnKey.rawValue)])
+        XCTAssertEqual(returnItems.first?.symbol, UnicodeToken.returnKey.string)
+        XCTAssertEqual(returnItems.first?.label, "return")
+        XCTAssertEqual(enterItems.map(\.identity), [.keyCode(KeyboardKeyCode.keypadEnter.rawValue)])
+        XCTAssertEqual(enterItems.first?.symbol, UnicodeToken.keypadEnter.string)
+        XCTAssertEqual(enterItems.first?.label, "enter")
+    }
+
     func testMouseItemUsesPressedStateFromMouseEventType() {
         let palette = Self.makePalette()
 

@@ -177,6 +177,24 @@ final class EventTransformerKeystrokeTests: XCTestCase {
         XCTAssertEqual(transform(keystroke), "⇥")
     }
 
+    func test_returnAndKeypadEnterUseDifferentSymbols() {
+        keystroke = makeKeystroke(
+            keyCode: KeyboardKeyCode.returnKey.rawValue,
+            modifiers: NSEvent.ModifierFlags(rawValue: 256),
+            characters: "\r",
+            charactersIgnoringModifiers: "\r"
+        )
+        XCTAssertEqual(transform(keystroke), UnicodeToken.returnKey.string)
+
+        keystroke = makeKeystroke(
+            keyCode: KeyboardKeyCode.keypadEnter.rawValue,
+            modifiers: NSEvent.ModifierFlags(rawValue: 256),
+            characters: "\r",
+            charactersIgnoringModifiers: "\r"
+        )
+        XCTAssertEqual(transform(keystroke), UnicodeToken.keypadEnter.string)
+    }
+
     func test_shiftTab() {
         let ch = String(UnicodeScalar(0x19)!)
         keystroke = makeKeystroke(keyCode: 48, modifiers: NSEvent.ModifierFlags(rawValue: 131330), characters: ch, charactersIgnoringModifiers: ch)

@@ -186,7 +186,8 @@ extension KeyboardKeyCode {
         case .tab:                     return "tab"
         case .escape:                  return "esc"
         case .delete, .forwardDelete:  return "delete"
-        case .returnKey, .keypadEnter: return "return"
+        case .returnKey:               return "return"
+        case .keypadEnter:             return "enter"
         case .capsLock:                return "caps lock"
         default:                       return nil
         }
@@ -223,8 +224,10 @@ extension KeyboardKeyCode {
             return UnicodeToken.pageUp.string
         case .pageDown:
             return UnicodeToken.pageDown.string
-        case .returnKey, .keypadEnter:
+        case .returnKey:
             return UnicodeToken.returnKey.string
+        case .keypadEnter:
+            return UnicodeToken.keypadEnter.string
         case .brightnessDown:
             return UnicodeToken.brightnessDown.string
         case .brightnessUp:
