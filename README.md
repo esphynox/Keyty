@@ -40,6 +40,16 @@ Keyty is a free, open-source app that visualizes your keyboard and mouse actions
 - Pointer highlight ring with configurable shape, color, size, and thickness
 - Pointer icon overlay with adjustable position, size, background, and tint
 
+## Customization
+
+Keyty can be tuned from Settings to match your workflow and presentation style:
+
+- **Appearance:** Choose keyboard overlay styles, themes, colors, and size.
+- **History:** Keep a visual trail of your recent inputs.
+- **Filters:** Control whether modified keystrokes, special keys, media keys, and mouse events appear.
+- **Mouse:** Configure pointer rings and pointer icons, including visibility, shape, color, size, offset, background, and tint.
+- **Placement:** Pick the display, screen anchor, margin, and stacking direction.
+
 ## Installation
 
 ### Github
