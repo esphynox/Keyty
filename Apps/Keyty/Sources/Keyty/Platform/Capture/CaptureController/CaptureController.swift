@@ -7,7 +7,6 @@
 //
 
 import Cocoa
-import ShortcutRecorder
 
 final class CaptureController {
     var isCapturing: Bool { self.state == .capturing }
@@ -20,7 +19,6 @@ final class CaptureController {
 
     private let eventTap = EventTap()
     private let eventProcessor = EventProcessor()
-    private let shortcutManager: ShortcutManager
     private let presenceManager: PresenceManager
     private let pointerVisualizersManager: PointerVisualizersManager
     private let keyboardVisualizer: KeyboardVisualizer
@@ -28,13 +26,11 @@ final class CaptureController {
     private var permissionObservationToken: PermissionObservationToken?
 
     init(
-        shortcutManager: ShortcutManager,
         presenceManager: PresenceManager,
         pointerVisualizersManager: PointerVisualizersManager,
         keyboardVisualizer: KeyboardVisualizer,
         permissionsService: any PermissionsService
     ) {
-        self.shortcutManager = shortcutManager
         self.presenceManager = presenceManager
         self.pointerVisualizersManager = pointerVisualizersManager
         self.keyboardVisualizer = keyboardVisualizer
@@ -191,14 +187,6 @@ extension CaptureController: EventTapDelegate {
     }
 
     func eventTap(_ tap: EventTap, noteKeystroke keystroke: StandardKeyEvent) {
-        if keystroke.type == .keyDown, let shortcut = self.shortcutManager.toggleCapturingShortcut {
-            let relevant: NSEvent.ModifierFlags = [.control, .command, .shift, .option]
-            if keystroke.keyCode == shortcut.keyCode.rawValue &&
-               keystroke.modifierFlags.intersection(relevant) == shortcut.modifierFlags.intersection(relevant) {
-                self.toggleCapturing()
-                return
-            }
-        }
         guard self.isCapturing else { return }
         self.eventProcessor.noteKeystroke(keystroke)
     }
