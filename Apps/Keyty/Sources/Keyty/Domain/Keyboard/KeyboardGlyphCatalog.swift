@@ -40,8 +40,10 @@ enum KeyboardGlyphCatalog {
         switch keyCode {
         case .escape:
             return UnicodeToken.escape.string
-        case .delete, .forwardDelete:
+        case .delete:
             return UnicodeToken.delete.string
+        case .forwardDelete:
+            return UnicodeToken.forwardDelete.string
         case .returnKey:
             return UnicodeToken.returnKey.string
         case .keypadEnter:
@@ -63,6 +65,8 @@ enum KeyboardGlyphCatalog {
             return UnicodeToken.escape.string
         case "DELETE", "BACKSPACE":
             return UnicodeToken.delete.string
+        case "DEL", "FORWARD DELETE":
+            return UnicodeToken.forwardDelete.string
         case "RETURN":
             return UnicodeToken.returnKey.string
         case "ENTER":

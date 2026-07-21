@@ -195,6 +195,24 @@ final class EventTransformerKeystrokeTests: XCTestCase {
         XCTAssertEqual(transform(keystroke), UnicodeToken.keypadEnter.string)
     }
 
+    func test_deleteAndForwardDeleteUseDifferentSymbols() {
+        keystroke = makeKeystroke(
+            keyCode: KeyboardKeyCode.delete.rawValue,
+            modifiers: NSEvent.ModifierFlags(rawValue: 256),
+            characters: UnicodeToken.delete.string,
+            charactersIgnoringModifiers: UnicodeToken.delete.string
+        )
+        XCTAssertEqual(transform(keystroke), UnicodeToken.delete.string)
+
+        keystroke = makeKeystroke(
+            keyCode: KeyboardKeyCode.forwardDelete.rawValue,
+            modifiers: NSEvent.ModifierFlags(rawValue: 256),
+            characters: UnicodeToken.forwardDelete.string,
+            charactersIgnoringModifiers: UnicodeToken.forwardDelete.string
+        )
+        XCTAssertEqual(transform(keystroke), UnicodeToken.forwardDelete.string)
+    }
+
     func test_shiftTab() {
         let ch = String(UnicodeScalar(0x19)!)
         keystroke = makeKeystroke(keyCode: 48, modifiers: NSEvent.ModifierFlags(rawValue: 131330), characters: ch, charactersIgnoringModifiers: ch)

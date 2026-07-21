@@ -95,6 +95,32 @@ final class KeycapItemFactoryTests: XCTestCase {
         XCTAssertEqual(enterItems.first?.label, "enter")
     }
 
+    func testDeleteAndForwardDeleteRenderDifferentLegends() {
+        let palette = Self.makePalette()
+
+        let deleteItems = KeycapItemFactory.keycapItems(
+            keyCode: KeyboardKeyCode.delete.rawValue,
+            displayString: KeyboardKeyCode.delete.displayText ?? "",
+            modifierFlags: [],
+            isPressed: true,
+            palette: palette
+        )
+        let forwardDeleteItems = KeycapItemFactory.keycapItems(
+            keyCode: KeyboardKeyCode.forwardDelete.rawValue,
+            displayString: KeyboardKeyCode.forwardDelete.displayText ?? "",
+            modifierFlags: [],
+            isPressed: true,
+            palette: palette
+        )
+
+        XCTAssertEqual(deleteItems.map(\.identity), [.keyCode(KeyboardKeyCode.delete.rawValue)])
+        XCTAssertEqual(deleteItems.first?.symbol, UnicodeToken.delete.string)
+        XCTAssertEqual(deleteItems.first?.label, "delete")
+        XCTAssertEqual(forwardDeleteItems.map(\.identity), [.keyCode(KeyboardKeyCode.forwardDelete.rawValue)])
+        XCTAssertEqual(forwardDeleteItems.first?.symbol, UnicodeToken.forwardDelete.string)
+        XCTAssertEqual(forwardDeleteItems.first?.label, "delete")
+    }
+
     func testMouseItemUsesPressedStateFromMouseEventType() {
         let palette = Self.makePalette()
 

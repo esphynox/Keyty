@@ -241,10 +241,17 @@ enum KeycapItemFactory {
                 layoutHints: KeycapLayoutHints(alignment: .left),
                 appearance: appearance
             )
-        case .delete, .forwardDelete:
+        case .delete:
             return KeycapItem(
                 identity: identity,
                 legend: .delete,
+                state: KeycapState(isPressed: isPressed),
+                appearance: appearance
+            )
+        case .forwardDelete:
+            return KeycapItem(
+                identity: identity,
+                legend: .forwardDelete,
                 state: KeycapState(isPressed: isPressed),
                 appearance: appearance
             )
