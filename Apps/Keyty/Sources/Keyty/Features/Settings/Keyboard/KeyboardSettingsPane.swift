@@ -144,12 +144,6 @@ struct KeyboardSettingsPane: View {
                 title: L10n.KeyboardVisualizer.layoutSectionTitle,
                 subtitle: L10n.KeyboardVisualizer.layoutSectionSubtitle
             ) {
-                SettingsControlRow(title: L10n.KeyboardVisualizer.axisLabel, subtitle: L10n.KeyboardVisualizer.axisSubtitle) {
-                    self.axisPicker
-                }
-
-                Divider()
-
                 SettingsControlRow(title: L10n.KeyboardVisualizer.anchorLabel, subtitle: L10n.KeyboardVisualizer.anchorSubtitle) {
                     Picker("", selection: self.$model.anchor) {
                         ForEach(KeyboardVisualizerAnchor.allCases, id: \.self) { anchor in
@@ -162,6 +156,19 @@ struct KeyboardSettingsPane: View {
 
                 Divider()
 
+                SettingsControlRow(title: L10n.KeyboardVisualizer.sizeLabel, subtitle: L10n.KeyboardVisualizer.sizeSubtitle) {
+                    SettingsSliderControl(
+                        value: self.$model.scale,
+                        range: self.model.scaleRange,
+                        step: self.model.scaleStep
+                    )
+                }
+            }
+
+            SettingsSectionView(
+                title: L10n.KeyboardVisualizer.historySectionTitle,
+                subtitle: L10n.KeyboardVisualizer.historySectionSubtitle
+            ) {
                 SettingsControlRow(title: L10n.KeyboardVisualizer.maxCountLabel, subtitle: L10n.KeyboardVisualizer.maxCountSubtitle) {
                     HStack(spacing: Spacing.sm) {
                         Text("\(self.model.maxCount)")
@@ -176,12 +183,8 @@ struct KeyboardSettingsPane: View {
 
                 Divider()
 
-                SettingsControlRow(title: L10n.KeyboardVisualizer.sizeLabel, subtitle: L10n.KeyboardVisualizer.sizeSubtitle) {
-                    SettingsSliderControl(
-                        value: self.$model.scale,
-                        range: self.model.scaleRange,
-                        step: self.model.scaleStep
-                    )
+                SettingsControlRow(title: L10n.KeyboardVisualizer.axisLabel, subtitle: L10n.KeyboardVisualizer.axisSubtitle) {
+                    self.axisPicker
                 }
             }
 
