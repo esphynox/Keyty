@@ -183,13 +183,32 @@ final class EventTransformerKeystrokeTests: XCTestCase {
         XCTAssertEqual(transform(keystroke), "⇤")
     }
 
+    func test_arrowKeysUseFilledTriangleSymbols() {
+        let cases: [(KeyboardKeyCode, String)] = [
+            (.leftArrow, "◀"),
+            (.upArrow, "▲"),
+            (.downArrow, "▼"),
+            (.rightArrow, "▶")
+        ]
+
+        for (keyCode, expected) in cases {
+            keystroke = makeKeystroke(
+                keyCode: keyCode.rawValue,
+                modifiers: NSEvent.ModifierFlags(rawValue: 256),
+                characters: expected,
+                charactersIgnoringModifiers: expected
+            )
+            XCTAssertEqual(transform(keystroke), expected)
+        }
+    }
+
     // MARK: - US English - Special Cases with Modifiers
 
     func test_optionShiftUp() {
         let ch = String(format: "%lu", UInt64(0x00006000002f5c00))
         keystroke = makeKeystroke(keyCode: 126, modifiers: NSEvent.ModifierFlags(rawValue: 11141410), characters: ch, charactersIgnoringModifiers: ch)
 
-        XCTAssertEqual(transform(keystroke), "⌥⇧↑")
+        XCTAssertEqual(transform(keystroke), "⌥⇧▲")
     }
 
     func test_optionUSpecialCase() {
