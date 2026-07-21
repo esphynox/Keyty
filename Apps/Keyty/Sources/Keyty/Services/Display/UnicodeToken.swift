@@ -24,7 +24,10 @@ enum UnicodeToken {
     static let delete: Unicode.Scalar = "\u{232B}"
     static let keypadClear: Unicode.Scalar = "\u{2327}"
     static let forwardDelete: Unicode.Scalar = "\u{2326}"
+    
     static let returnKey: Unicode.Scalar = "\u{21A9}"
+    static let keypadEnter: Unicode.Scalar = "\u{2305}"
+    
     static let questionMark: Unicode.Scalar = "\u{003F}"
     static let enclosingCircle: Unicode.Scalar = "\u{20DD}"
     static let home: Unicode.Scalar = "\u{2196}"

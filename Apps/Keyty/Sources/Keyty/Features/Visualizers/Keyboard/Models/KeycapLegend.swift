@@ -54,6 +54,7 @@ extension KeycapLegend {
     static let escape = KeycapLegend(symbol: KeyboardGlyphCatalog.symbol(for: .escape), label: KeyboardKeyCode.escape.label)
     static let delete = KeycapLegend(symbol: KeyboardGlyphCatalog.symbol(for: .delete), label: KeyboardKeyCode.delete.label)
     static let `return` = KeycapLegend(symbol: KeyboardGlyphCatalog.symbol(for: .returnKey), label: KeyboardKeyCode.returnKey.label)
+    static let enter = KeycapLegend(symbol: KeyboardGlyphCatalog.symbol(for: .keypadEnter), label: KeyboardKeyCode.keypadEnter.label)
     static let space = KeycapLegend(symbol: KeyboardGlyphCatalog.symbol(for: .space))
     static let capsLock = KeycapLegend(label: KeyboardKeyCode.capsLock.label)
 }

@@ -248,10 +248,17 @@ enum KeycapItemFactory {
                 state: KeycapState(isPressed: isPressed),
                 appearance: appearance
             )
-        case .returnKey, .keypadEnter:
+        case .returnKey:
             return KeycapItem(
                 identity: identity,
                 legend: .return,
+                state: KeycapState(isPressed: isPressed),
+                appearance: appearance
+            )
+        case .keypadEnter:
+            return KeycapItem(
+                identity: identity,
+                legend: .enter,
                 state: KeycapState(isPressed: isPressed),
                 appearance: appearance
             )

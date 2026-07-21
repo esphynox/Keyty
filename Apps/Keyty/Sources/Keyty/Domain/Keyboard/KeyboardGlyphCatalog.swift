@@ -42,8 +42,10 @@ enum KeyboardGlyphCatalog {
             return UnicodeToken.escape.string
         case .delete, .forwardDelete:
             return UnicodeToken.delete.string
-        case .returnKey, .keypadEnter:
+        case .returnKey:
             return UnicodeToken.returnKey.string
+        case .keypadEnter:
+            return UnicodeToken.keypadEnter.string
         case .tab:
             return tab
         case .space:
@@ -61,8 +63,10 @@ enum KeyboardGlyphCatalog {
             return UnicodeToken.escape.string
         case "DELETE", "BACKSPACE":
             return UnicodeToken.delete.string
-        case "RETURN", "ENTER":
+        case "RETURN":
             return UnicodeToken.returnKey.string
+        case "ENTER":
+            return UnicodeToken.keypadEnter.string
         case "TAB":
             return tab
         case "SPACE":
