@@ -87,8 +87,7 @@ private extension EventTransformer {
             response += KeyboardGlyphCatalog.shift
         }
 
-        if let keyCode = KeyboardKeyCode(rawValue: keystroke.keyCode),
-           let specialKeyString = keyCode.displayText {
+        if let specialKeyString = KeyboardSpecialKeyResolver.displayText(for: keystroke) {
             response += specialKeyString
             return response
         }

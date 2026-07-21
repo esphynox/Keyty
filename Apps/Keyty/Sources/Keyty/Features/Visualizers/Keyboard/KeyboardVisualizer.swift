@@ -102,8 +102,7 @@ final class KeyboardVisualizer {
         }
 
         if !self.visualizerSettings.showSpecialKeys,
-           let keyCode = KeyboardKeyCode(rawValue: keystroke.keyCode),
-           keyCode.isSpecial {
+           KeyboardSpecialKeyResolver.isSpecial(keystroke) {
             return
         }
 
