@@ -68,6 +68,7 @@
 "general.display_icon.menu_bar_and_dock" = "Menu Bar and Dock";
 "general.toggle_capturing_label" = "Toggle capturing";
 "general.toggle_capturing_subtitle" = "Global shortcut used to start or stop capturing from anywhere.";
+"general.shortcut_validation_fallback" = "This shortcut cannot be used.";
 "general.start_capturing" = "Enable";
 "general.stop_capturing" = "Disable";
 "general.show_settings_at_launch" = "Show settings at launch";

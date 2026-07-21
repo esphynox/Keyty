@@ -19,13 +19,13 @@ final class AppServiceContainer {
 
     init(
         settings: AppSettingsContainer,
-        dockItemController: DockItemController
+        dockItemController: DockItemController,
+        statusShortcutItem: NSMenuItem
     ) {
         let pointerVisualizersManager = PointerVisualizersManager(
             pointerRingSettings: settings.pointerRingSettings,
             pointerIconSettings: settings.pointerIconSettings
         )
-        let shortcutManager = ShortcutManager(settings: settings.shortcutSettings)
         let presenceManager = PresenceManager(
             dockItemController: dockItemController,
             settings: settings.presenceSettings
@@ -33,21 +33,28 @@ final class AppServiceContainer {
         let keyboardVisualizer = KeyboardVisualizer(store: settings.store)
         keyboardVisualizer.activate()
         let permissionsService = SystemPermissionsService()
-
-        self.permissionsService = permissionsService
-        self.pointerVisualizersManager = pointerVisualizersManager
-        self.keyboardVisualizer = keyboardVisualizer
-        self.shortcutManager = shortcutManager
-        self.presenceManager = presenceManager
         let captureController = CaptureController(
             presenceManager: presenceManager,
             pointerVisualizersManager: pointerVisualizersManager,
             keyboardVisualizer: keyboardVisualizer,
             permissionsService: permissionsService
         )
-        shortcutManager.onToggleCapturingShortcut = { [weak captureController] in
-            captureController?.toggleCapturing()
-        }
+        let shortcutManager = ShortcutManager(
+            settings: settings.shortcutSettings,
+            menuItemPresenter: ShortcutMenuItemPresenter(
+                statusShortcutItem: statusShortcutItem,
+                dockShortcutItem: dockItemController.shortcutItem
+            ),
+            onToggleCapturingShortcut: { [weak captureController] in
+                captureController?.toggleCapturing()
+            }
+        )
+
+        self.permissionsService = permissionsService
+        self.pointerVisualizersManager = pointerVisualizersManager
+        self.keyboardVisualizer = keyboardVisualizer
+        self.shortcutManager = shortcutManager
+        self.presenceManager = presenceManager
         self.captureController = captureController
     }
 }

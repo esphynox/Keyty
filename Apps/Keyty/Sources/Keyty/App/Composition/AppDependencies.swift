@@ -36,16 +36,13 @@ final class AppDependencies {
         self.settings = AppSettingsContainer(store: keyValueStore)
         self.services = AppServiceContainer(
             settings: self.settings,
-            dockItemController: dockItemController
+            dockItemController: dockItemController,
+            statusShortcutItem: statusShortcutItem
         )
         self.ui = AppUIContainer(
             settings: self.settings,
             services: self.services,
             updater: updater
         )
-
-        self.services.shortcutManager.statusShortcutItem = statusShortcutItem
-        self.services.shortcutManager.dockShortcutItem = dockItemController.shortcutItem
-        self.services.shortcutManager.refreshMenuItems()
     }
 }

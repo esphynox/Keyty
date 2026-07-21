@@ -22,12 +22,18 @@ final class GeneralSettingsPaneViewModel: ObservableObject {
         didSet { self.appSettings.visibleAtLaunch = self.visibleAtLaunch }
     }
 
+    @Published var shortcutValidationMessage: String?
+
     init(shortcutManager: ShortcutManager, presenceManager: PresenceManager, appSettings: any AppSettingsProtocol) {
         self.shortcutManager = shortcutManager
         self.presenceManager = presenceManager
         self.appSettings = appSettings
 
-        self.displayIconLocation = presenceManager.displayIconLocationRawValue
-        self.visibleAtLaunch = appSettings.visibleAtLaunch
+        self.displayIconLocation = self.presenceManager.displayIconLocationRawValue
+        self.visibleAtLaunch = self.appSettings.visibleAtLaunch
+        self.shortcutValidationMessage = self.shortcutManager.shortcutValidationMessage
+        self.shortcutManager.onShortcutValidationMessageChanged = { [weak self] message in
+            self?.shortcutValidationMessage = message
+        }
     }
 }
