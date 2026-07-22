@@ -138,7 +138,7 @@ extension KeyboardSettingsPane.PreviewGroup {
                 ),
                 .key(
                     keyCode: KeyboardKeyCode.escape.rawValue,
-                    displayString: KeyboardGlyphCatalog.symbol(for: .escape)
+                    displayString: KeyboardGlyphCatalog.symbol(for: KeyboardSpecialKey.escape)
                 ),
             ],
         ]
@@ -158,7 +158,7 @@ extension KeyboardSettingsPane.PreviewGroup {
             [
                 .key(
                     keyCode: KeyboardKeyCode.returnKey.rawValue,
-                    displayString: KeyboardGlyphCatalog.symbol(for: .returnKey)
+                    displayString: KeyboardGlyphCatalog.symbol(for: KeyboardSpecialKey.returnKey)
                 )
             ],
         ]

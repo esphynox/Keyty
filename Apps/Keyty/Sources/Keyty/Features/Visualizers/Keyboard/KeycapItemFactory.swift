@@ -213,11 +213,11 @@ enum KeycapItemFactory {
         isPressed: Bool,
         palette: KeycapThemePalette
     ) -> KeycapItem? {
-        guard let keyboardKeyCode = KeyboardKeyCode(rawValue: keyCode) else { return nil }
+        guard let specialKey = KeyboardSpecialKeyResolver.specialKey(for: keyCode) else { return nil }
 
         let identity = KeycapIdentity.keyCode(keyCode)
         let appearance = palette.appearance(for: identity)
-        switch keyboardKeyCode {
+        switch specialKey {
         case .function:
             return KeycapItem(
                 identity: identity,

@@ -35,26 +35,9 @@ enum KeyboardGlyphCatalog {
         return modifierKeyCodes.contains(keyCode)
     }
 
-    /// Returns the glyph we show for a typed keyboard key code when the key has a special visual representation.
-    static func symbol(for keyCode: KeyboardKeyCode) -> String {
-        switch keyCode {
-        case .escape:
-            return UnicodeToken.escape.string
-        case .delete:
-            return UnicodeToken.delete.string
-        case .forwardDelete:
-            return UnicodeToken.forwardDelete.string
-        case .returnKey:
-            return UnicodeToken.returnKey.string
-        case .keypadEnter:
-            return UnicodeToken.keypadEnter.string
-        case .tab:
-            return tab
-        case .space:
-            return UnicodeToken.visibleSpace.string
-        default:
-            preconditionFailure("No special glyph mapping defined for \(keyCode)")
-        }
+    /// Returns the glyph we show for a typed keyboard key when it has a semantic visual representation.
+    static func symbol(for key: KeyboardSpecialKey) -> String {
+        key.displayText
     }
 
     /// Returns the normalized display symbol we show for fallback display text.

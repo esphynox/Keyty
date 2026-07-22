@@ -238,6 +238,23 @@ final class EventTransformerKeystrokeTests: XCTestCase {
         }
     }
 
+    func test_insertFunctionKeyDisplaysInsertForHelpKeyCode() {
+        let ch = Self.appKitFunctionKey(NSInsertFunctionKey)
+        keystroke = makeKeystroke(keyCode: KeyboardKeyCode.help.rawValue, modifiers: [], characters: ch, charactersIgnoringModifiers: ch)
+        XCTAssertEqual(transform(keystroke), "ins")
+    }
+
+    func test_helpFunctionKeyDisplaysHelpForHelpKeyCode() {
+        let ch = Self.appKitFunctionKey(NSHelpFunctionKey)
+        keystroke = makeKeystroke(keyCode: KeyboardKeyCode.help.rawValue, modifiers: [], characters: ch, charactersIgnoringModifiers: ch)
+        XCTAssertEqual(transform(keystroke), UnicodeToken.questionMark.string + UnicodeToken.enclosingCircle.string)
+    }
+
+    func test_helpKeyCodeWithoutSemanticCharactersDefaultsToInsert() {
+        keystroke = makeKeystroke(keyCode: KeyboardKeyCode.help.rawValue, modifiers: [], characters: "", charactersIgnoringModifiers: "")
+        XCTAssertEqual(transform(keystroke), "ins")
+    }
+
     // MARK: - US English - Special Cases with Modifiers
 
     func test_optionShiftUp() {
@@ -267,5 +284,9 @@ final class EventTransformerKeystrokeTests: XCTestCase {
     func test_commandßDisplaysCommandß() {
         keystroke = makeKeystroke(keyCode: 27, modifiers: NSEvent.ModifierFlags(rawValue: 1048840), characters: "ß", charactersIgnoringModifiers: "ß")
         XCTAssertEqual(transform(keystroke), "⌘ß")
+    }
+
+    private static func appKitFunctionKey(_ key: Int) -> String {
+        String(UnicodeScalar(key)!)
     }
 }

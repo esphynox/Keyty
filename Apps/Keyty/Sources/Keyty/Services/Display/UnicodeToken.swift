@@ -49,6 +49,7 @@ enum UnicodeToken {
     static let visibleSpace: Unicode.Scalar = "\u{2423}"
     static let zeroWidthSpace: Unicode.Scalar = "\u{200B}"
 
+    static let contextMenu: Unicode.Scalar = "\u{25A4}"
     static let brightnessDown: Unicode.Scalar = "\u{1F505}"
     static let brightnessUp: Unicode.Scalar = "\u{1F506}"
     static let missionControl: Unicode.Scalar = "\u{1F5A5}"
