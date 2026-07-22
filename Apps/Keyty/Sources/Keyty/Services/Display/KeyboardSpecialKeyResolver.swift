@@ -9,23 +9,12 @@
 import AppKit
 import Foundation
 
-enum KeyboardSpecialKey {
-    case keyCode(KeyboardKeyCode)
-    case help
-    case insert
-
-    var displayText: String? {
-        switch self {
-        case .keyCode(let keyCode):
-            return keyCode.displayText
-        case .help:
-            return UnicodeToken.questionMark.string + UnicodeToken.enclosingCircle.string
-        case .insert:
-            return "ins"
-        }
-    }
-}
-
+/// Resolves semantic special keys from full key events.
+///
+/// Keyty keeps raw virtual key codes as physical identity, but some keys need
+/// event-level semantic data to display correctly. For example, macOS uses the
+/// legacy Help virtual key slot for many external keyboards' Insert key, while
+/// AppKit can still expose separate Help and Insert function-key characters.
 enum KeyboardSpecialKeyResolver {
     static func specialKey(for event: StandardKeyEvent) -> KeyboardSpecialKey? {
         if let semanticKey = self.semanticKey(from: event.charactersIgnoringModifiers)
@@ -33,15 +22,46 @@ enum KeyboardSpecialKeyResolver {
             return semanticKey
         }
 
-        guard let keyCode = KeyboardKeyCode(rawValue: event.keyCode), keyCode.isSpecial else {
+        return self.specialKey(for: event.keyCode)
+    }
+
+    static func specialKey(for rawKeyCode: UInt16) -> KeyboardSpecialKey? {
+        guard let keyCode = KeyboardKeyCode(rawValue: rawKeyCode) else {
             return nil
         }
 
-        if keyCode == .help {
-            return .insert
+        if let functionKey = KeyboardSpecialKey.functionRow(keyCode) {
+            return functionKey
         }
 
-        return .keyCode(keyCode)
+        if let systemKey = KeyboardSpecialKey.SystemKey.key(for: keyCode) {
+            return .system(systemKey)
+        }
+
+        switch keyCode {
+        case .escape:        return .escape
+        case .tab:           return .tab
+        case .delete:        return .delete
+        case .forwardDelete: return .forwardDelete
+        case .returnKey:     return .returnKey
+        case .keypadEnter:   return .keypadEnter
+        case .space:         return .space
+        case .help:          return .insert
+        case .keypadClear:   return .keypadClear
+        case .home:          return .home
+        case .end:           return .end
+        case .pageUp:        return .pageUp
+        case .pageDown:      return .pageDown
+        case .leftArrow:     return .leftArrow
+        case .rightArrow:    return .rightArrow
+        case .upArrow:       return .upArrow
+        case .downArrow:     return .downArrow
+        case .function:      return .function
+        case .capsLock:      return .capsLock
+        case .eisu:          return .eisu
+        case .kana:          return .kana
+        default:             return nil
+        }
     }
 
     static func displayText(for event: StandardKeyEvent) -> String? {
@@ -59,6 +79,22 @@ enum KeyboardSpecialKeyResolver {
             return .help
         case NSInsertFunctionKey:
             return .insert
+        case NSHomeFunctionKey:
+            return .home
+        case NSEndFunctionKey:
+            return .end
+        case NSPageUpFunctionKey:
+            return .pageUp
+        case NSPageDownFunctionKey:
+            return .pageDown
+        case NSLeftArrowFunctionKey:
+            return .leftArrow
+        case NSRightArrowFunctionKey:
+            return .rightArrow
+        case NSUpArrowFunctionKey:
+            return .upArrow
+        case NSDownArrowFunctionKey:
+            return .downArrow
         default:
             return nil
         }

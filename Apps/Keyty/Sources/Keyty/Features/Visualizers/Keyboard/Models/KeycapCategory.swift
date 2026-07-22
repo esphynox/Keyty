@@ -32,7 +32,7 @@ enum KeycapCategory: CaseIterable {
             // modifiers, so it follows the modifier theme rather than the special theme.
             if code == KeyboardKeyCode.function.rawValue {
                 self = .modifier
-            } else if KeyboardKeyCode(rawValue: code)?.isSpecial == true {
+            } else if KeyboardSpecialKeyResolver.specialKey(for: code) != nil {
                 self = .special
             } else {
                 self = .regular

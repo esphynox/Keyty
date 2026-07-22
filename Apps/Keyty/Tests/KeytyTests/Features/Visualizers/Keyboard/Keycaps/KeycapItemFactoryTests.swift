@@ -74,14 +74,14 @@ final class KeycapItemFactoryTests: XCTestCase {
 
         let returnItems = KeycapItemFactory.keycapItems(
             keyCode: KeyboardKeyCode.returnKey.rawValue,
-            displayString: KeyboardKeyCode.returnKey.displayText ?? "",
+            displayString: KeyboardSpecialKey.returnKey.displayText,
             modifierFlags: [],
             isPressed: true,
             palette: palette
         )
         let enterItems = KeycapItemFactory.keycapItems(
             keyCode: KeyboardKeyCode.keypadEnter.rawValue,
-            displayString: KeyboardKeyCode.keypadEnter.displayText ?? "",
+            displayString: KeyboardSpecialKey.keypadEnter.displayText,
             modifierFlags: [],
             isPressed: true,
             palette: palette
@@ -100,14 +100,14 @@ final class KeycapItemFactoryTests: XCTestCase {
 
         let deleteItems = KeycapItemFactory.keycapItems(
             keyCode: KeyboardKeyCode.delete.rawValue,
-            displayString: KeyboardKeyCode.delete.displayText ?? "",
+            displayString: KeyboardSpecialKey.delete.displayText,
             modifierFlags: [],
             isPressed: true,
             palette: palette
         )
         let forwardDeleteItems = KeycapItemFactory.keycapItems(
             keyCode: KeyboardKeyCode.forwardDelete.rawValue,
-            displayString: KeyboardKeyCode.forwardDelete.displayText ?? "",
+            displayString: KeyboardSpecialKey.forwardDelete.displayText,
             modifierFlags: [],
             isPressed: true,
             palette: palette

@@ -12,19 +12,19 @@ import XCTest
 
 final class KeyboardVisualizerSpecialKeyFilteringTests: XCTestCase {
     func testClassifiesPrintableLetterAsNonSpecial() {
-        XCTAssertFalse(KeyboardKeyCode.a.isSpecial)
+        XCTAssertNil(KeyboardSpecialKeyResolver.specialKey(for: KeyboardKeyCode.a.rawValue))
     }
 
     func testClassifiesTabAsSpecial() {
-        XCTAssertTrue(KeyboardKeyCode.tab.isSpecial)
+        XCTAssertEqual(KeyboardSpecialKeyResolver.specialKey(for: KeyboardKeyCode.tab.rawValue), .tab)
     }
 
     func testClassifiesArrowKeyAsSpecial() {
-        XCTAssertTrue(KeyboardKeyCode.upArrow.isSpecial)
+        XCTAssertEqual(KeyboardSpecialKeyResolver.specialKey(for: KeyboardKeyCode.upArrow.rawValue), .upArrow)
     }
 
     func testClassifiesFunctionRowKeyAsSpecial() {
-        XCTAssertTrue(KeyboardKeyCode.f5.isSpecial)
+        XCTAssertEqual(KeyboardSpecialKeyResolver.specialKey(for: KeyboardKeyCode.f5.rawValue), .functionRow(5))
     }
 
     func testResolverClassifiesInsertFunctionKeyAsSpecial() {
