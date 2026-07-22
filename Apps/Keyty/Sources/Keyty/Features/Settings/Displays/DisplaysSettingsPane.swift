@@ -48,13 +48,7 @@ struct DisplaysSettingsPane: View {
                     title: L10n.Displays.anchorLabel,
                     subtitle: L10n.Displays.anchorSubtitle
                 ) {
-                    Picker("", selection: $model.selectedAnchor) {
-                        ForEach(KeyboardVisualizerAnchor.allCases, id: \.self) { anchor in
-                            Text("\(anchor.symbol) \(anchor.label)").tag(anchor)
-                        }
-                    }
-                    .labelsHidden()
-                    .frame(width: Size.Control.settingsPickerWidth, alignment: .trailing)
+                    KeyboardVisualizerAnchorPicker(selection: $model.selectedAnchor)
                 }
 
                 Divider()

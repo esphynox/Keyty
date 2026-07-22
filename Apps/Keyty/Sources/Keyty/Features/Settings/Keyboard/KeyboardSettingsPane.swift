@@ -145,13 +145,7 @@ struct KeyboardSettingsPane: View {
                 subtitle: L10n.KeyboardVisualizer.layoutSectionSubtitle
             ) {
                 SettingsControlRow(title: L10n.KeyboardVisualizer.anchorLabel, subtitle: L10n.KeyboardVisualizer.anchorSubtitle) {
-                    Picker("", selection: self.$model.anchor) {
-                        ForEach(KeyboardVisualizerAnchor.allCases, id: \.self) { anchor in
-                            Text(anchor.label).tag(anchor)
-                        }
-                    }
-                    .labelsHidden()
-                    .frame(width: Size.Control.settingsPickerWidth, alignment: .trailing)
+                    KeyboardVisualizerAnchorPicker(selection: self.$model.anchor)
                 }
 
                 Divider()
