@@ -19,12 +19,12 @@ struct KeyboardVisualizerAnchor: Hashable {
     var symbol: String {
         switch (self.vertical, self.horizontal) {
         case (.top, .leading):      UnicodeToken.upLeftArrow.string
-        case (.top, .center):       UnicodeToken.upArrow.string
+        case (.top, .center):       UnicodeToken.upwardsArrow.string
         case (.top, .trailing):     UnicodeToken.upRightArrow.string
-        case (.middle, .leading):   UnicodeToken.leftArrow.string
-        case (.middle, .trailing):  UnicodeToken.rightArrow.string
+        case (.middle, .leading):   UnicodeToken.leftwardsArrow.string
+        case (.middle, .trailing):  UnicodeToken.rightwardsArrow.string
         case (.bottom, .leading):   UnicodeToken.downLeftArrow.string
-        case (.bottom, .center):    UnicodeToken.downArrow.string
+        case (.bottom, .center):    UnicodeToken.downwardsArrow.string
         case (.bottom, .trailing):  UnicodeToken.downRightArrow.string
         case (.middle, .center):    UnicodeToken.bulletOperator.string
         }
