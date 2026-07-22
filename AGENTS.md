@@ -37,6 +37,12 @@ CI (`.github/workflows/build.yml`) has no signing identity and keeps those flags
 
 Run `tuist generate` after changing `Project.swift`, dependencies, build settings, resources, or generated project structure.
 
+## Git Workflow
+
+- Use Conventional Commits for commit messages and branch names.
+- Branch names should follow `<type>/<short-description>`, for example `fix/menu-bar-position` or `feat/input-overlay-theme`.
+- Commit messages should follow `<type>(<scope>): <description>` when a scope is useful, for example `fix(settings): clamp overlay opacity`.
+
 ## Code Style
 
 - Follow the existing Swift style: explicit `self.`, small focused types, protocol-backed services/settings, and XCTest coverage near the touched feature.
