@@ -43,7 +43,7 @@ private extension ShortcutMenuItemPresenter {
 extension ShortcutMenuItemPresenter: ShortcutMenuItemPresenting {
     func displayShortcut(_ shortcut: Shortcut?) {
         if let shortcut {
-            let keyEquivalent = SymbolicKeyCodeTransformer.shared.transformedValue(NSNumber(value: shortcut.keyCode.rawValue)) ?? ""
+            let keyEquivalent = KeyEquivalentTransformer.shared.transformedValue(shortcut) ?? ""
             self.setKeyEquivalent(keyEquivalent)
             self.setKeyEquivalentModifierMask(shortcut.modifierFlags)
         } else {
