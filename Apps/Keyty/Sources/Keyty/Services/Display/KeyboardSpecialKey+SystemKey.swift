@@ -30,7 +30,7 @@ extension KeyboardSpecialKey.SystemKey {
     var displayText: String {
         switch self {
         case .contextMenu:
-            return "menu"
+            return UnicodeToken.contextMenu.string
         case .brightnessUp:
             return UnicodeToken.brightnessUp.string
         case .brightnessDown:

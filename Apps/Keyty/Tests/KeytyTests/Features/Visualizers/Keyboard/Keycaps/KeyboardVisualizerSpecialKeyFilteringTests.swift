@@ -27,6 +27,11 @@ final class KeyboardVisualizerSpecialKeyFilteringTests: XCTestCase {
         XCTAssertEqual(KeyboardSpecialKeyResolver.specialKey(for: KeyboardKeyCode.f5.rawValue), .functionRow(5))
     }
 
+    func testClassifiesContextMenuKeyAsSystemKey() {
+        XCTAssertEqual(KeyboardSpecialKeyResolver.specialKey(for: KeyboardKeyCode.contextMenu.rawValue), .system(.contextMenu))
+        XCTAssertEqual(KeyboardSpecialKey.SystemKey.contextMenu.displayText, UnicodeToken.contextMenu.string)
+    }
+
     func testResolverClassifiesInsertFunctionKeyAsSpecial() {
         let ch = Self.appKitFunctionKey(NSInsertFunctionKey)
         let event = Self.makeKeystroke(
