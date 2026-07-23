@@ -1,18 +1,7 @@
 /* Main menu */
 "main_menu.about" = "About %@";
-"main_menu.check_for_updates" = "Check For Updates";
 "main_menu.settings" = "Settings…";
-"main_menu.services" = "Services";
-"main_menu.hide" = "Hide %@";
-"main_menu.hide_others" = "Hide Others";
-"main_menu.show_all" = "Show All";
 "main_menu.quit" = "Quit %@";
-"main_menu.file" = "File";
-"main_menu.close" = "Close";
-"main_menu.help" = "Help";
-"main_menu.send_feedback" = "Send Feedback…";
-"main_menu.github" = "GitHub…";
-"main_menu.website" = "Website…";
 
 /* About window */
 "about.version" = "Version %@ (%@)";

@@ -23,7 +23,7 @@ final class AppController: NSObject {
             updaterDelegate: nil,
             userDriverDelegate: nil
         )
-        self.menuController = MenuController(updaterController: self.updaterController)
+        self.menuController = MenuController()
         let statusShortcutItem = self.menuController.makeStatusShortcutMenuItem()
         self.statusItemController = StatusItemController(
             menu: self.menuController.makeStatusMenu(shortcutItem: statusShortcutItem),
@@ -43,14 +43,6 @@ final class AppController: NSObject {
 
 // MARK: - NSApplicationDelegate
 extension AppController: NSApplicationDelegate {
-    func applicationWillFinishLaunching(_ notification: Notification) {
-        guard ProcessEnvironment.isRunningApp else {
-            return
-        }
-
-        NSApp.mainMenu = self.menuController.makeMainMenu()
-    }
-
     func applicationDidFinishLaunching(_ notification: Notification) {
         guard ProcessEnvironment.isRunningApp else {
             return
@@ -131,20 +123,5 @@ extension AppController {
     @objc
     func quitApplication(_ sender: Any?) {
         NSApp.terminate(sender)
-    }
-
-    @objc
-    func sendFeedback(_ sender: Any?) {
-        NSWorkspace.shared.open(AppConstants.feedbackURL)
-    }
-
-    @objc
-    func openGitHub(_ sender: Any?) {
-        NSWorkspace.shared.open(AppConstants.githubURL)
-    }
-
-    @objc
-    func openWebsite(_ sender: Any?) {
-        NSWorkspace.shared.open(AppConstants.websiteURL)
     }
 }
