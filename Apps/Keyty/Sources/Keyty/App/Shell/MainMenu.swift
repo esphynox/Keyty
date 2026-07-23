@@ -8,6 +8,7 @@
 
 import AppKit
 
+/// Builds and wires the status item menu used by the menu-bar-only app.
 final class MenuController {
     private weak var appController: AppController?
     private var controlledMenuItems: [NSMenuItem] = []
@@ -34,7 +35,10 @@ final class MenuController {
         menu.addItem(self.register(quit))
         return menu
     }
+}
 
+// MARK: - Private API
+private extension MenuController {
     private func makeSettingsMenuItem() -> NSMenuItem {
         let item = NSMenuItem(
             title: L10n.MainMenu.settings,
