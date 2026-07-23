@@ -14,27 +14,20 @@ final class AppServiceContainer {
     let pointerVisualizersManager: PointerVisualizersManager
     let keyboardVisualizer: KeyboardVisualizer
     let shortcutManager: ShortcutManager
-    let presenceManager: PresenceManager
     let captureController: CaptureController
 
     init(
         settings: AppSettingsContainer,
-        dockItemController: DockItemController,
         statusShortcutItem: NSMenuItem
     ) {
         let pointerVisualizersManager = PointerVisualizersManager(
             pointerRingSettings: settings.pointerRingSettings,
             pointerIconSettings: settings.pointerIconSettings
         )
-        let presenceManager = PresenceManager(
-            dockItemController: dockItemController,
-            settings: settings.presenceSettings
-        )
         let keyboardVisualizer = KeyboardVisualizer(store: settings.store)
         keyboardVisualizer.activate()
         let permissionsService = SystemPermissionsService()
         let captureController = CaptureController(
-            presenceManager: presenceManager,
             pointerVisualizersManager: pointerVisualizersManager,
             keyboardVisualizer: keyboardVisualizer,
             permissionsService: permissionsService
@@ -42,8 +35,7 @@ final class AppServiceContainer {
         let shortcutManager = ShortcutManager(
             settings: settings.shortcutSettings,
             menuItemPresenter: ShortcutMenuItemPresenter(
-                statusShortcutItem: statusShortcutItem,
-                dockShortcutItem: dockItemController.shortcutItem
+                statusShortcutItem: statusShortcutItem
             ),
             onToggleCapturingShortcut: { [weak captureController] in
                 captureController?.toggleCapturing()
@@ -54,7 +46,6 @@ final class AppServiceContainer {
         self.pointerVisualizersManager = pointerVisualizersManager
         self.keyboardVisualizer = keyboardVisualizer
         self.shortcutManager = shortcutManager
-        self.presenceManager = presenceManager
         self.captureController = captureController
     }
 }

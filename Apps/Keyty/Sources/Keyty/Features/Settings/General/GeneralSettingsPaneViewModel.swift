@@ -11,12 +11,7 @@ import SwiftUI
 final class GeneralSettingsPaneViewModel: ObservableObject {
     let shortcutManager: ShortcutManager
 
-    private let presenceManager: PresenceManager
     private let appSettings: any AppSettingsProtocol
-
-    @Published var displayIconLocation: Int {
-        didSet { self.presenceManager.displayIconLocationRawValue = self.displayIconLocation }
-    }
 
     @Published var visibleAtLaunch: Bool {
         didSet { self.appSettings.visibleAtLaunch = self.visibleAtLaunch }
@@ -24,12 +19,10 @@ final class GeneralSettingsPaneViewModel: ObservableObject {
 
     @Published var shortcutValidationMessage: String?
 
-    init(shortcutManager: ShortcutManager, presenceManager: PresenceManager, appSettings: any AppSettingsProtocol) {
+    init(shortcutManager: ShortcutManager, appSettings: any AppSettingsProtocol) {
         self.shortcutManager = shortcutManager
-        self.presenceManager = presenceManager
         self.appSettings = appSettings
 
-        self.displayIconLocation = self.presenceManager.displayIconLocationRawValue
         self.visibleAtLaunch = self.appSettings.visibleAtLaunch
         self.shortcutValidationMessage = self.shortcutManager.shortcutValidationMessage
         self.shortcutManager.onShortcutValidationMessageChanged = { [weak self] message in
