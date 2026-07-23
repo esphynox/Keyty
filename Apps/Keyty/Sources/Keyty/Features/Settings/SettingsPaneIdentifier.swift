@@ -15,6 +15,7 @@ enum SettingsPaneIdentifier: String, CaseIterable {
     case displays
     case permissions
     case update
+    case info
 }
 
 extension SettingsPaneIdentifier {
@@ -36,6 +37,8 @@ extension SettingsPaneIdentifier {
             return L10n.Settings.Pane.permissions
         case .update:
             return L10n.Settings.Pane.update
+        case .info:
+            return L10n.Settings.Pane.info
         }
     }
 
@@ -53,6 +56,8 @@ extension SettingsPaneIdentifier {
             return "hand.raised.fill"
         case .update:
             return "arrow.trianglehead.clockwise"
+        case .info:
+            return "info.circle.fill"
         }
     }
 
@@ -70,6 +75,8 @@ extension SettingsPaneIdentifier {
             return Color.Theme.Palette.red
         case .update:
             return Color.Theme.Palette.teal
+        case .info:
+            return Color.Theme.Palette.green
         }
     }
 

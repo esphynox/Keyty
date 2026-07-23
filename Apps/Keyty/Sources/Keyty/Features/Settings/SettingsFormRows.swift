@@ -51,9 +51,42 @@ struct SettingsControlRow<Content: View>: View {
 
             self.content
                 .frame(minWidth: Size.Control.settingsPickerWidth, alignment: .trailing)
+                .layoutPriority(1)
         }
         .padding(.vertical, Spacing.none)
         .frame(maxWidth: .infinity, alignment: .center)
+    }
+}
+
+struct SettingsLinkRow: View {
+    let title: String
+    let url: URL
+    let displayText: String
+
+    init(title: String, url: URL, displayText: String? = nil) {
+        self.title = title
+        self.url = url
+        self.displayText = displayText ?? url.absoluteString
+    }
+
+    var body: some View {
+        SettingsControlRow(title: self.title) {
+            Link(destination: self.url) {
+                HStack(spacing: Spacing.xxs) {
+                    Text(self.displayText)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                        .layoutPriority(1)
+
+                    Image(systemName: "arrow.up.right.square")
+                        .imageScale(.small)
+                }
+                .font(Typography.Settings.rowTitle)
+                .foregroundColor(Color.Theme.Accent.controlAccent)
+            }
+            .help(self.url.absoluteString)
+            .frame(minWidth: Size.Control.settingsPickerWidth, alignment: .trailing)
+        }
     }
 }
 

@@ -41,6 +41,7 @@
 "settings.pane.displays" = "Displays";
 "settings.pane.permissions" = "Permissions";
 "settings.pane.update" = "Update";
+"settings.pane.info" = "Info";
 
 /* Anchor labels */
 "anchor.left" = "Left";
@@ -73,6 +74,11 @@
 "general.stop_capturing" = "Disable";
 "general.show_settings_at_launch" = "Show settings at launch";
 "general.show_settings_at_launch_subtitle" = "Reopen the settings window automatically when Keyty starts.";
+
+/* Info settings pane */
+"info.github_label" = "GitHub";
+"info.website_label" = "Website";
+"info.email_label" = "Email";
 
 /* Keyboard visualizer settings pane */
 "keyboard_visualizer.live_overlay_section_title" = "Live Overlay";

@@ -92,6 +92,14 @@ struct SettingsPaneRegistry {
                     AnyView(UpdateSettingsPane(updater: updater))
                 }
             ),
+            SettingsPaneEntry(
+                id: .info,
+                title: SettingsPaneIdentifier.info.label,
+                systemImageName: SettingsPaneIdentifier.info.sfSymbolName,
+                makeView: {
+                    AnyView(InfoSettingsPane())
+                }
+            ),
         ]
     }
 
