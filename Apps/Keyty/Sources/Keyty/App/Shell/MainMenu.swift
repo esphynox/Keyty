@@ -112,10 +112,6 @@ final class MenuController {
         self.makeShortcutMenuItem(action: #selector(AppController.toggleCapturing(_:)))
     }
 
-    func makeDockShortcutMenuItem() -> NSMenuItem {
-        self.makeShortcutMenuItem(action: #selector(AppController.toggleCapturing(_:)))
-    }
-
     func makeStatusMenu(shortcutItem: NSMenuItem) -> NSMenu {
         let menu = NSMenu(title: AppConstants.appName)
         menu.addItem(shortcutItem)
@@ -123,12 +119,6 @@ final class MenuController {
         let quit = NSMenuItem(title: L10n.MainMenu.quit(AppConstants.appName), action: #selector(AppController.quitApplication(_:)), keyEquivalent: "q")
         quit.keyEquivalentModifierMask = [.command]
         menu.addItem(self.register(quit))
-        return menu
-    }
-
-    func makeDockMenu(shortcutItem: NSMenuItem) -> NSMenu {
-        let menu = NSMenu(title: AppConstants.appName)
-        menu.addItem(shortcutItem)
         return menu
     }
 

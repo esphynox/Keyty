@@ -24,11 +24,9 @@ final class AppDependencies {
     var pointerIconSettings: any PointerIconSettingsProtocol { self.settings.pointerIconSettings }
     var aboutWindowController: AboutWindowController { self.ui.aboutWindowController }
     var settingsWindowController: SettingsWindowController { self.ui.settingsWindowController }
-    var presenceManager: PresenceManager { self.services.presenceManager }
     var shortcutManager: ShortcutManager { self.services.shortcutManager }
 
     init(
-        dockItemController: DockItemController,
         statusShortcutItem: NSMenuItem,
         updater: SPUUpdater,
         keyValueStore: KeyValueStore = UserDefaultsStore()
@@ -36,7 +34,6 @@ final class AppDependencies {
         self.settings = AppSettingsContainer(store: keyValueStore)
         self.services = AppServiceContainer(
             settings: self.settings,
-            dockItemController: dockItemController,
             statusShortcutItem: statusShortcutItem
         )
         self.ui = AppUIContainer(

@@ -22,7 +22,6 @@ struct SettingsPaneRegistry {
 
     init(
         shortcutManager: ShortcutManager,
-        presenceManager: PresenceManager,
         appSettings: any AppSettingsProtocol,
         pointerRingVisualizer: PointerRingVisualizer,
         pointerRingSettings: any PointerRingSettingsProtocol,
@@ -40,7 +39,6 @@ struct SettingsPaneRegistry {
                     AnyView(
                         GeneralSettingsPane(
                             shortcutManager: shortcutManager,
-                            presenceManager: presenceManager,
                             appSettings: appSettings
                         )
                     )

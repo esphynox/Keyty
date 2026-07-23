@@ -62,11 +62,6 @@
 /* General settings pane */
 "general.appearance_section_title" = "App";
 "general.shortcut_section_title" = "Shortcut";
-"general.display_icon_label" = "Display %@ icon";
-"general.display_icon_subtitle" = "Choose where the app icon is visible";
-"general.display_icon.menu_bar" = "Menu Bar";
-"general.display_icon.dock" = "Dock";
-"general.display_icon.menu_bar_and_dock" = "Menu Bar and Dock";
 "general.toggle_capturing_label" = "Toggle capturing";
 "general.toggle_capturing_subtitle" = "Global shortcut used to start or stop capturing from anywhere.";
 "general.shortcut_validation_fallback" = "This shortcut cannot be used.";

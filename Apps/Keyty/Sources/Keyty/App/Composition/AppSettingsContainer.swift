@@ -13,7 +13,6 @@ final class AppSettingsContainer {
     let appSettings: any AppSettingsProtocol
     let pointerRingSettings: any PointerRingSettingsProtocol & ReactiveSettings
     let pointerIconSettings: any PointerIconSettingsProtocol & ReactiveSettings
-    let presenceSettings: any PresenceSettingsProtocol & ReactiveSettings
     let shortcutSettings: any ShortcutSettingsProtocol
     let keyboardVisualizerSettings: KeyboardVisualizerSettings
 
@@ -23,7 +22,6 @@ final class AppSettingsContainer {
         self.appSettings = AppSettings(store: store)
         self.pointerRingSettings = PointerRingSettings(store: store)
         self.pointerIconSettings = PointerIconSettings(store: store)
-        self.presenceSettings = PresenceSettings(store: store)
         self.shortcutSettings = ShortcutSettings(store: store)
         self.keyboardVisualizerSettings = KeyboardVisualizerSettings(store: store)
         
@@ -34,7 +32,6 @@ final class AppSettingsContainer {
         self.appSettings.registerDefaults()
         self.pointerRingSettings.registerDefaults()
         self.pointerIconSettings.registerDefaults()
-        self.presenceSettings.registerDefaults()
         self.shortcutSettings.registerDefaults()
         self.keyboardVisualizerSettings.registerDefaults()
     }

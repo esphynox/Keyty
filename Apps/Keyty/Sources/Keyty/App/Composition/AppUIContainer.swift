@@ -25,7 +25,6 @@ final class AppUIContainer {
         )
         settingsWindowController = SettingsWindowController(
             shortcutManager: services.shortcutManager,
-            presenceManager: services.presenceManager,
             appSettings: settings.appSettings,
             pointerRingVisualizer: services.pointerVisualizersManager.ring,
             pointerRingSettings: settings.pointerRingSettings,

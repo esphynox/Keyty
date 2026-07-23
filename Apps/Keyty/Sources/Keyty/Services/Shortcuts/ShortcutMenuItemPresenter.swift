@@ -15,14 +15,12 @@ protocol ShortcutMenuItemPresenting: AnyObject {
     func displayShortcut(_ shortcut: Shortcut?)
 }
 
-/// Updates status bar and dock menu items to display the currently assigned toggle shortcut.
+/// Updates the status bar menu item to display the currently assigned toggle shortcut.
 final class ShortcutMenuItemPresenter {
     private weak var statusShortcutItem: NSMenuItem?
-    private weak var dockShortcutItem: NSMenuItem?
 
-    init(statusShortcutItem: NSMenuItem, dockShortcutItem: NSMenuItem) {
+    init(statusShortcutItem: NSMenuItem) {
         self.statusShortcutItem = statusShortcutItem
-        self.dockShortcutItem = dockShortcutItem
     }
 }
 
@@ -30,12 +28,10 @@ final class ShortcutMenuItemPresenter {
 private extension ShortcutMenuItemPresenter {
     private func setKeyEquivalent(_ keyEquivalent: String) {
         self.statusShortcutItem?.keyEquivalent = keyEquivalent
-        self.dockShortcutItem?.keyEquivalent = keyEquivalent
     }
 
     private func setKeyEquivalentModifierMask(_ modifierFlags: NSEvent.ModifierFlags) {
         self.statusShortcutItem?.keyEquivalentModifierMask = modifierFlags
-        self.dockShortcutItem?.keyEquivalentModifierMask = modifierFlags
     }
 }
 

@@ -19,19 +19,16 @@ final class CaptureController {
 
     private let eventTap = EventTap()
     private let eventProcessor = EventProcessor()
-    private let presenceManager: PresenceManager
     private let pointerVisualizersManager: PointerVisualizersManager
     private let keyboardVisualizer: KeyboardVisualizer
     private let permissionsService: any PermissionsService
     private var permissionObservationToken: PermissionObservationToken?
 
     init(
-        presenceManager: PresenceManager,
         pointerVisualizersManager: PointerVisualizersManager,
         keyboardVisualizer: KeyboardVisualizer,
         permissionsService: any PermissionsService
     ) {
-        self.presenceManager = presenceManager
         self.pointerVisualizersManager = pointerVisualizersManager
         self.keyboardVisualizer = keyboardVisualizer
         self.permissionsService = permissionsService
@@ -122,7 +119,6 @@ private extension CaptureController {
     func applyCapturing(_ capturing: Bool) {
         guard !capturing || self.eventTap.isInstalled else { return }
         let wasCapturing = self.isCapturing
-        self.presenceManager.isCapturing = capturing
         Task { @MainActor [pointerVisualizersManager = self.pointerVisualizersManager] in
             pointerVisualizersManager.isPresentationActive = capturing
         }
